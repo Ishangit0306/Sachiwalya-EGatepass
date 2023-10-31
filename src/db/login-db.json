@@ -1,0 +1,26 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "username": "securityuser",
+            "password": "password",
+            "email": "securityuser@example.com",
+            "firstName": "Security",
+            "lastName": "User",
+            "roleId": "security",
+            "departmentName": null,
+            "departmentId": null
+        },
+        {
+            "id": 2,
+            "username": "employeeuser",
+            "password": "password",
+            "email": "employee@example.com",
+            "firstName": "Employee",
+            "lastName": "User",
+            "roleId": "employee",
+            "departmentName": "IT",
+            "departmentId": 1
+        }
+    ]
+}

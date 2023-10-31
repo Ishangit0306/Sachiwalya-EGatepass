@@ -1,0 +1,22 @@
+{
+  "expo": {
+    
+    "extra": {
+      "eas": {
+        "projectId": "867e1578-b61b-4c79-8aaf-4c5b306b5052"
+      }
+    },
+    "android": {
+      "package": "com.ishanmalhotra.EGatepass"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos."
+        }
+      ]
+    ]
+  }
+}
