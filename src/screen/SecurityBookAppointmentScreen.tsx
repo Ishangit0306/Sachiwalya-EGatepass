@@ -93,7 +93,8 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
   }, []);
 
   const [dept, setDpt] = useState<any>(role == ROLE_TYPE_EMPLOYEE ? 'General' : ''); // employee id
-
+  const [desActualData, setDesActualData] = useState<any>([])
+  const [odata, setOdata] = useState<any>([])
   const [designationData, setDesignationData] = useState([]);
   const isListRender = React.useRef(true);
   const isDesignationRender = React.useRef(true);
@@ -103,6 +104,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
       if (!isListRender.current) {
         fetchDesignation(dept).then((data) => {
           let designationdata: any = [];
+          setDesActualData(data.data);
           data.data.map((entry: any) => {
             const designation = entry.designation;
             const employee = entry.employee;
@@ -144,6 +146,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
       if (!isDesignationRender.current) {
         fetchOfficer(dept, desig).then((data) => {
           let officerdata: any = [];
+          setOdata(data.data);
           data.data.map((entry: any) => {
             const designation = entry.designation;
             const employee = entry.employee;
@@ -258,10 +261,28 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
       documentType: id,
       date: formatDate(date),
       time: formatTime(time),
+      designation:desig,
+      officer: empid,
       dept: dept,
+      officer_name:'',
+      officer_o_name:'',
+      officer_did:'',
+      designation_d_name:'',
+      designation_name :'',
+      designation_did:'',
     };
+    const dData = desActualData.find((item: any) => item.did == formdata.designation);
+    const Odata = odata.find((item: any) => item.eid == formdata.officer);
+   
+    formdata.officer_name = Odata.employee
+    formdata. officer_o_name=Odata.designation
+    formdata. officer_did=formdata.officer 
+    formdata.designation_name=dData.employee
+    formdata.designation_d_name=dData.designation
+    formdata.designation_did= formdata.designation 
+    //const oObj = { "name": Odata.employee, "o_name": Odata.designation, "did": formdata.officer };
+    //const dObj = { "name": dData.employee, "d_name": dData.designation, "did": formdata.designation };
     console.log('form formdata********************', formdata);
-
     setSubmitting(false);
 
     if (id === 4 || id === 'none') {

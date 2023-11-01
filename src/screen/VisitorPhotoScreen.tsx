@@ -285,7 +285,13 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
       role: roleId,
       dept: params?.dept,
       email: params?.email,
-      uploade_image_id: params?.upload_image_id
+      uploade_image_id: params?.upload_image_id,
+      designation_d_name:params?.designation_d_name,
+      designation_did:params?.designation_did,
+      designation_name:params?.designation_name,
+      officer_did:params?.officer_name,
+      officer_name:params?.officer_name,
+      officer_o_name:params?.officer_o_name
     };
 
 
@@ -305,6 +311,12 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
     formData.append("phNo", formStoreData.phNo);
     formData.append("name", formStoreData.name);
     formData.append("upload_image_id", formStoreData.uploade_image_id);
+    formData.append("designation_d_name",formStoreData.designation_d_name);
+    formData.append("designation_name",formStoreData.designation_name);
+    formData.append("designation_did",formStoreData.designation_did);
+    formData.append("officer_name",formStoreData.officer_name);
+    formData.append("officer_o_name",formStoreData.officer_o_name);
+    formData.append("officer_did",formStoreData.officer_did);
 
     console.log('my form data>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#########################', formStoreData);
 
