@@ -8,7 +8,7 @@ import { selectAuthenticated } from '../stores/authentication/selectors';
 
 const EnterOTPScreen = ({ navigation, route}: any) => {
   const {data}= route.params;
-  
+  console.log('datainotpScren',route);
   const authState = useAppSelector(selectAuthenticated);
  
 
@@ -60,7 +60,7 @@ const EnterOTPScreen = ({ navigation, route}: any) => {
         alignItems: 'center'
       }}>
         {/* Login compoenent */}
-        <OTPComponent navigation={navigation} otp={data} />
+        <OTPComponent navigation={navigation} otp={data} formdata={route.params}/>
       </View>
     </View>
     </KeyboardAvoidingView>

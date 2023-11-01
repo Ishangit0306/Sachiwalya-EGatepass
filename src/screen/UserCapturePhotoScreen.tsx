@@ -10,7 +10,6 @@ const UserCapturePhotoScreen = ({ navigation, route }: any) => {
   const { token }: any = useAppSelector(selectAuthenticated);
   const dispatch = useAppDispatch();
   const [isButton, setIsButton] = useState<boolean>(false);
-
   const sendPhotoToNextScreen = async ({ photo }: any) => {
     setIsButton(true)
     let fileName = photo.uri.replace(/^.*[\\\/]/, "");
@@ -38,8 +37,15 @@ const UserCapturePhotoScreen = ({ navigation, route }: any) => {
 
     
       console.log('image data',formData);
-  
-       navigation.navigate('UserRegistration',{formData,mobile:route.params.mobile,authdata:params.authdata});
+       if(params.isUserID)
+       {
+        navigation.navigate('EnterOTPScreen',{data:params.otp,formData});
+       }
+       else
+       {
+        navigation.navigate('UserRegistration',{formData,mobile:route.params.mobile,authdata:params.authdata});
+       }
+       //navigation.navigate('UserRegistration',{formData,mobile:route.params.mobile,authdata:params.authdata});
    
       let resultData: any;
       //const formSubmission = await scannedDocumentApi(formData, token);

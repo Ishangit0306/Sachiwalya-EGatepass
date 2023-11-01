@@ -902,3 +902,44 @@ export const officerName = async (dept:any,designation:any) => {
       };
   }
 };
+
+export const scannedUserDocumentApi = async (data: FormData) => {
+  console.log('scannedApidata,', data);
+  try {
+    const response = await fetch(`${API_BASE_URL}/oldvisitor/capture`, {
+      method: 'POST',
+      headers: {
+        //Accept: 'application/json',
+        // 'Content-Type': 'multipart/form-data',
+        //Authorization: `Bearer ${token}`,
+      },
+      body: data,
+    });
+    const resData = await response.json();
+
+    console.log('scanneddocapi', resData);
+    if (response.ok) {
+      return {
+        data: resData,
+        statusCode: 201,
+        message: 'success',
+        error: false,
+      };
+    } else {
+      return {
+        data: null,
+        statusCode: response.status,
+        message: resData.message || 'Unknown error',
+        error: true,
+      };
+    }
+  } catch (error) {
+    console.error('Error in bookAppointmentFormApi:', error);
+    return {
+      data: null,
+      statusCode: null,
+      message: error,
+      error: true,
+    };
+  }
+};
