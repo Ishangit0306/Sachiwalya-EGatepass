@@ -413,7 +413,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                         maxHeight={300}
                         labelField='label'
                         valueField='value'
-                        placeholder= {role==ROLE_TYPE_EMPLOYEE?'Forest & Environment':'Select Department'}
+                        placeholder= {'Select Department'}
                         searchPlaceholder='Search...'
                         value={dept}
                         onChange={(item) => {
@@ -434,7 +434,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                         maxHeight={300}
                         labelField='label'
                         valueField='value'
-                        placeholder= {role==ROLE_TYPE_EMPLOYEE?'Prin.Secy(Shri Ramesh Kumar)':'Select Designation'}
+                        placeholder= {'Select Designation'}
                         searchPlaceholder='Search...'
                         value={desig}
                         onChange={(item) => {
@@ -455,7 +455,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                         maxHeight={300}
                         labelField='label'
                         valueField='value'
-                        placeholder= {role==ROLE_TYPE_EMPLOYEE?'Amit Bharti(P.S.)':'Whom to Meet'}
+                        placeholder= {'Whom to Meet'}
                         searchPlaceholder='Search...'
                         value={empid}
                         onChange={(item) => {

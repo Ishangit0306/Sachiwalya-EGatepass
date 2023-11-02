@@ -12,6 +12,7 @@ import { showToast } from './showToast';
 import { getUserInfo } from '../stores/userdata/selectors';
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Loader from './Loader';
 
 interface LoginFormValues {
     //organizationName: string;
@@ -38,28 +39,55 @@ const ID_OPTIONS = [
     { label: "None", value: 4 }
   
   ];
-
-
 const OTPComponent = ({ navigation, otp ,formdata}: any) => {
 
+    const [isLoading, setIsLoading] = useState(false);
+    const [dropid, setDropid] = useState<any>(1);
+    let userData: any = []
+     
+        const existingUser = async (data: any) => {
+            dispatch(resetUser());
+            const existinguser: any = (await fetchUser(data)).data;
+            userData.push(existinguser);
+            dispatch(storeuser(existinguser));
+            // if(existinguser.uid!=undefined)
+            // {
+               
+            //     navigation.navigate('UserRegistration', { mobile, authdata:userData[0] });
+            // }
+            if(existinguser.uid!=undefined)
+            {
+                return true
+            }
+            else{
+                return false
+            }
+            
+           
+        }
 
+useEffect(()=>{
     if(formdata?.formData)
     {
             let form = new FormData();
-            form.append("typeOfId", 3);
+            form.append("typeOfId", dropid);
             form.append("file",formdata.formData);
-            console.log('formData is',form)
+            setIsLoading(true);
              scannedUserDocumentApi(form).then((data)=>{
-                navigation.navigate('UserRegistration', { mobile, authdata:{name:data.data.name,visitorId:data.data.idNo} });
+                setIsLoading(false);
+                navigation.navigate('UserRegistration', { mobile, authdata:{name:data.data.name,visitorId:data.data.idNo,doctype:dropid, upload_image_id:data.data.id,id_pic:data.data.id_pic} });
             });    
     }
-    console.log('formdatainotp',formdata.formData);
-
+       
+    
+},[formdata])
+   
+ 
+ 
+  
   
 const[dbuser,setDbuser]=useState(false);
-    
 
-    const [dropid, setDropid] = useState<any>(1);
     const [isShowUploadButton, setShowUploadButton] = useState(false);
     //useEffect(()=>{},[isShowUploadButton]);
     const authdata = useAppSelector(getUserInfo);
@@ -69,103 +97,42 @@ const[dbuser,setDbuser]=useState(false);
     const expecteddata = otp;
     const [receivedotp, setReceivedotp] = useState(otp.otp);
     const { id, mobile } = expecteddata;
-    console.log('id,mobile', id, mobile)
 
   
-
-    console.log("otpdata from api", expecteddata);
     const verifyOtp = async (enteredOTP: any, navigation: any) => {
         const data = { enteredOTP, id, mobile };
-        let userData: any = []
-     
-        const existingUser = async (data: any) => {
-
-
-            dispatch(resetUser());
-            const existinguser: any = (await fetchUser(data)).data;
-            
-            userData.push(existinguser);
-            dispatch(storeuser(existinguser));
-            if(existinguser.uid!=undefined && enteredOTP == "1234")
+        const res =await  verifyOtpApi(data);
+         const{validate}=res;
+        if(validate)
+        {
+            setShowUploadButton(true)
+           const activeuser= await existingUser(data);
+            if(activeuser)
             {
-               
+                setIsLoading(true);
                 navigation.navigate('UserRegistration', { mobile, authdata:userData[0] });
-                //setShowUploadButton(!isShowUploadButton)
-             //setDbuser(true);
-             //console.log("in dbuser",dbuser);
-           
-            }
-            
-                
-                if(formdata?.formData)
-                {
-                        let form = new FormData();
-                        form.append("typeOfId", 3);
-                        form.append("file",formdata.formData);
-                         scannedUserDocumentApi(form).then((data)=>{
-                            navigation.navigate('UserRegistration', { mobile, authdata:{name:data.data.name,visitorId:data.data.idNo} });
-                        });    
-                }
-           
-        }
-
-        await existingUser(data);
-        const res = verifyOtpApi(data);
-
-        // if (enteredOTP == expecteddata.otp) {
-        //     //setIsValidOTP(true);
-        //     navigation.navigate('UserRegistration');
-        //   }
-        //    else {
-        //     Alert.alert("Invalid Otp");
-
-        //   }
-        if (enteredOTP == "1234") {
-
-            //setIsValidOTP(true);
-            //setShowUploadButton(!isShowUploadButton);
-           console.log('dbinif',dbuser);
-            if(dbuser)
-            {
-
-               // navigation.navigate('UserRegistration', { mobile, authdata:userData[0] });
             }
         }
-        else {
+        else{
+            setShowUploadButton(false)
             Alert.alert("Invalid Otp");
-
         }
     }
-
-    // const dispatch = useAppDispatch();
-
     const handleFormSubmit = (
         values: LoginFormValues,
 
         { setSubmitting }: FormikHelpers<LoginFormValues>,
     ) => {
-      console.log('ishsho',isShowUploadButton);
         if (values) {
-            setShowUploadButton(true);
-            // if(!isShowUploadButton){
-
-            //     
-            // }
-            // else{
-            //     console.log("else is working")
-            // }
             verifyOtp(values.otpNumber, navigation);
         }
         setSubmitting(false);
     };
     const handleUploadID = () => {
-        // Add logic to handle ID upload
-        console.log('hi i m working')
         navigation.navigate('UserUploadProfile', { mobile,isUserID:true,otp})
     };
-useEffect(()=>{},[isShowUploadButton]);
-    console.log('isbutton',isShowUploadButton);
-    console.log('dbuserexist',dbuser);
+
+  
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <SafeAreaView style={{
@@ -184,18 +151,10 @@ useEffect(()=>{},[isShowUploadButton]);
                         touched,
                         isSubmitting,
                     }) => (
-                        <>
-                            {/* <View style={styles.inputContainer}>
-                                <Text style={styles.label}>SELECT ORGANIZATION</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    onChangeText={handleChange('organizationName')}
-                                    onBlur={handleBlur('organizationName')}
-                                    value={values.organizationName}
-                                    placeholder={'SELECT ORGANISATION'}
-                                />
-                                <Text style={styles.errorTxt}>{touched.organizationName && errors.organizationName ? errors.organizationName : null}</Text>
-                            </View> */}
+                        isLoading?(<>
+                       <Loader></Loader>
+                       </>):
+                       ( <>
                             {!isShowUploadButton ? (<View style={styles.inputContainer}>
                                 <Text style={styles.label}>ENTER YOUR 4 DIGIT OTP NUMBER</Text>
                                 <TextInput
@@ -228,7 +187,7 @@ useEffect(()=>{},[isShowUploadButton]);
                                 labelField="label"
                                 valueField="value"
                                 placeholder="Select an ID"
-                                value={id}
+                                value={dropid}
                                 onChange={(item) => {
                                     setDropid(item.value);
                                 }}
@@ -245,10 +204,10 @@ useEffect(()=>{},[isShowUploadButton]);
                         </View>)
                             }
                     {!isShowUploadButton  && <TouchableOpacity
-                        //onPress={() => handleSubmit()}
+                       
                         onPress={() =>
                             handleSubmit()
-                            //navigation.navigate('VisitorBookAppointmentScreen')
+                           
                         }
                         style={styles.loginButton}
                     >
@@ -284,11 +243,9 @@ useEffect(()=>{},[isShowUploadButton]);
                             {isSubmitting ? 'Submitting...' : 'Resend OTP'}
                         </Text>
                     </TouchableOpacity>}
-
-
-
-                    {/* <Toast ref={(ref) => Toast.setRef(ref)} /> */}
                 </>
+                )
+                    
                     )}
             </Formik>
         </SafeAreaView>

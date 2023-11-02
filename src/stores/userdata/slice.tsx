@@ -10,7 +10,8 @@ const initialState: UserFormData = {
     pic:'',
     uid:'',
     typeOfId:0,
-    email:''
+    email:'',
+    idpic:''
 }
 
 export const slice = createSlice({
@@ -31,6 +32,7 @@ export const slice = createSlice({
                 state.uid=action.payload.uid;
                 state.typeOfId=action.payload.typeOfId;
                 state.email=action.payload.email;
+                state.idpic=action.payload.idpic;
         },
 
         resetUser: () => {

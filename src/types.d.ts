@@ -78,6 +78,7 @@ export type UserFormData={
   uid:string
   typeOfId:number
   email:string
+  idpic:string
 }
 export type UserState={
   user:UserFormData;

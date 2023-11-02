@@ -36,6 +36,25 @@ const QRdisplayScreen = ({ navigation, route }: any) => {
   return (
     <View style={{}}>
       <ScrollView style={styles.container}>
+
+      <View style={styles.field}>
+          <Text style={styles.label}>Visitor Photo </Text>
+          
+          <Image
+            style={styles.image}
+            source={{ uri: `${API_BASE_URL}/v1.0/visitor/image/${data.uphoto}` }}
+          />
+        </View>
+
+        {data.id_pic != "null" && data.id_pic != null && data ? (
+          <View style={styles.field}>
+            <Text style={styles.label}>Visitor Id Photo</Text>
+            <Image
+              style={styles.image}
+              source={{ uri: `${API_BASE_URL}/v1.0/visitor/image/${data.id_pic}` }}
+            />
+          </View>
+        ) : null}
         <View style={styles.field}>
           <Text style={styles.label}>Visitor Name:</Text>
           <Text style={styles.value}>{data.uname}</Text>
@@ -84,24 +103,6 @@ const QRdisplayScreen = ({ navigation, route }: any) => {
           <Text style={styles.value}>{data?.uphone}</Text>
         </View>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Visitor Photo </Text>
-          
-          <Image
-            style={styles.image}
-            source={{ uri: `${API_BASE_URL}/v1.0/visitor/image/${data.uphoto}` }}
-          />
-        </View>
-
-        {data.id_pic != "null" && data.id_pic != null && data ? (
-          <View style={styles.field}>
-            <Text style={styles.label}>Visitor Id Photo</Text>
-            <Image
-              style={styles.image}
-              source={{ uri: `${API_BASE_URL}/v1.0/visitor/image/${data.id_pic}` }}
-            />
-          </View>
-        ) : null}
       </ScrollView>
     </View>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView } from 'react-native';
 import { TextInput, Button, Headline } from 'react-native-paper';
 import Icons from '../constants/Icons';
 import LoginComponent from '../components/LoginComponent';
@@ -11,6 +11,10 @@ const AdminScreen = ({ navigation }: any) => {
 
   console.log('user current state data are>>>>>>>>>>', authState)
   return (
+    <KeyboardAvoidingView
+    behavior={ "padding" }
+    style={{ flex: 1 }}
+>
     <View style={{
       flex: 1,
       justifyContent: 'center',
@@ -56,6 +60,7 @@ const AdminScreen = ({ navigation }: any) => {
         <LoginComponent navigation={navigation} />
       </View>
     </View>
+    </KeyboardAvoidingView>
   );
 };
 

@@ -60,7 +60,7 @@ const MemberScreen = ({ navigation }: any) => {
       <View>
        <TouchableOpacity
        onPress={()=>navigation.navigate('Login')}>
-        <Text style={styles.label}>Login?</Text>
+        <Text style={styles.label}>Login</Text>
        </TouchableOpacity>
 
       </View>

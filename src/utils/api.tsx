@@ -586,8 +586,8 @@ export const fetchOtpApi = async (data: any) => {
 export const verifyOtpApi = async (data: any) => {
   //const requestData = data;
   const requestBody = {
-    otp: data.enteredOtp,
-    id: data.mobile,
+    otp: data.enteredOTP,
+    id: data.id,
     mobile: data.mobile,
 
   };
@@ -595,7 +595,7 @@ export const verifyOtpApi = async (data: any) => {
   try {
     console.log('base url', API_BASE_URL);
     const response = await fetch(`${API_BASE_URL}/v1.0/verification/otp-validate`, {
-      method: 'POST',
+      method: 'PATCH',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -671,7 +671,7 @@ export const fetchUser = async (data: any) => {
     });
     const resdata = await response.json();
     const resData = resdata.data;
-    console.log('resData', resData.uidentitytype);
+    console.log('resData', resData);
     console.log('reduxstoreapidata', resData);
 
     if (response.ok) {
@@ -685,7 +685,8 @@ export const fetchUser = async (data: any) => {
         pic: resData.uphoto,
         uid: resData.uid,
         typeOfId: resData.uidentitytype,
-        email: resData.uemail
+        email: resData.uemail,
+        idpic:resData.id_pic
       }
       console.log('redux store data will be', resdatad);
       return {

@@ -26,7 +26,7 @@ const loginValidationSchema = yup.object().shape({
     // email: yup.string().email('Invalid email').required('Email is required'),
    // organizationName: yup.string().required('Please select Organization'),
     mobileNumber: yup.string()
-    .required('Please Enter Mobile Number')
+    .required('Please Enter Mobile Number').min(10, 'Mobile Number must be atleast 10 characters')
     .matches(/^[0-9]+$/, 'Mobile Number must contain only numbers')
     .max(10, 'Mobile Number must be at most 10 characters')
 });

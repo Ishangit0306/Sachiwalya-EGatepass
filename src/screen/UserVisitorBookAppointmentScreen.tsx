@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Platform } from "react-native";
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Platform, BackHandler } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import Icons from "../constants/Icons";
 import { Dropdown } from "react-native-element-dropdown";
@@ -56,6 +56,16 @@ interface SecurityBookAppointmentValues {
 }
 
 const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
+
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      navigation.navigate('UserRegister');
+      return true; // Return true to prevent the default back action
+    });
+
+    return () => backHandler.remove(); // Clean up the event listener when the component unmounts
+  }, []);
   const [uploadAgain, setUploadAgain] = useState(false);
   useEffect(
     () => {
@@ -66,8 +76,12 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
     }, [uploadAgain]
   )
   let { params } = route;
-  console.log('paramsinuservisitor',params.authdata);
-  const {name,address,visitorId}=params?.authdata?params.authdata:null;
+  console.log('paramsinuservisitor', params.authdata);
+  const { name, address, visitorId } = params?.authdata ? params.authdata : null;
+  const { doctype, id_pic, upload_image_id } = params?.authdata ? params.authdata : null;
+  console.log('doctypw', doctype);
+  console.log('id', upload_image_id);
+  console.log('pci', id_pic);
   const formData = params?.formData;
   //console.log(formData?._parts[0][1].uri);
   params = params ?? JSON.stringify(params);
@@ -94,6 +108,8 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
   const [isloading, setisloading] = useState(true);
 
   const data = useAppSelector(getUserInfo);
+  console.log('datacoming',data);
+  const idimage=id_pic??data.idpic
   //console.log('Reduxdata',data);
   const [id, setId] = useState<any>(1); // doc id
   const [empid, setEmpid] = useState<any>(user ? user.id : 0); // employee id
@@ -241,12 +257,12 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
 
   const initialValues: SecurityBookAppointmentValues = {
     //departmentName: role === 'employee' ? user?.departmentName : '',
-    visitername: name??"",
+    visitername: name ?? "",
     email_id: data.email ?? "",
     // employeeId: '',
     //visit_purpose: '',
     meeting_purpose: '',
-    doc_no: visitorId?? '',
+    doc_no: visitorId ?? '',
     contact_number: data.contactNumber ?? '',
     address: address ?? '',
     // date: role === 'employee' ? currentDate.toLocaleDateString() : currentDate.toLocaleDateString(),
@@ -289,7 +305,8 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
       vid: data?.uid,
       contact_number: data.contactNumber ? data.contactNumber : params.mobile,
       visit_purpose: selectedPurpose,
-      visitor_id:''
+      visitor_id: '',
+      upload_image_id: upload_image_id ?? ""
     };
     if (!data.uid) {
       formdata.img = params?.formData
@@ -297,7 +314,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
     else {
 
       if (uploadAgain) {
-        formdata.visitor_id=data.uid
+        formdata.visitor_id = data.uid
         formdata.img = params?.formData
       }
     }
@@ -326,7 +343,8 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
     formData.append("email_id", formdata.email_id);
     formData.append("emp_id", formdata.emp_id);
     formData.append("img", formdata.img);
-    formData.append("visitor_id",formdata.visitor_id);
+    formData.append("visitor_id", formdata.visitor_id);
+    formData.append("upload_image_id", formdata.upload_image_id);
     console.log('uid', data.uid);
 
     //  console.log('my form data>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#########################', formStoreData);
@@ -456,10 +474,10 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
       setId(data.typeOfId)
     }
     else {
-      setId(1);
+      setId(doctype);
     }
   }, [data])
- 
+
   return (
     <View style={{
       flex: 1,
@@ -492,7 +510,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
             <Formik
               initialValues={initialValues}
               validationSchema={validationSchema}
-            
+
               onSubmit={handleFormSubmit}
             >
               {({
@@ -734,7 +752,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
                     </Text> */}
                     <View style={styles.radioGroup}>
                       <RadioGroup
-
+                       layout="row"
                         radioButtons={radioButtons}
                         onPress={setSelectedPurpose}
                         selectedId={selectedPurpose}
@@ -749,7 +767,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
                       style={styles.input}
                       onChangeText={handleChange("meeting_purpose")}
                       onBlur={handleBlur("meeting_purpose")}
-                      value={values.meeting_purpose}
+                      value={ values.meeting_purpose}
                       placeholder="Purpose of Meeting"
                     />
                     <Text style={styles.errorTxt}>
@@ -761,7 +779,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
 
                   {!data.pic && (!clicked || !imageUri) && <TouchableOpacity
                     style={styles.buttonupload}
-                    onPress={() => { navigation.navigate('UserUploadProfile', { mobile: params.mobile ,authdata:params.authdata }), setClicked(!clicked) }}
+                    onPress={() => { navigation.navigate('UserUploadProfile', { mobile: params.mobile, authdata: params.authdata }), setClicked(!clicked) }}
                   >
                     <Text style={styles.buttonText}>Upload Your Photo</Text>
                   </TouchableOpacity>}
@@ -776,81 +794,22 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
                         />
 
                       </View>
-                      <View><TouchableOpacity onPress={() => { navigation.navigate('UserUploadProfile', { mobile: params.mobile ,authdata:params.authdata}), setClicked(!clicked), setUploadAgain(!uploadAgain) }}>
+                      <View><TouchableOpacity onPress={() => { navigation.navigate('UserUploadProfile', { mobile: params.mobile, authdata: params.authdata }), setClicked(!clicked), setUploadAgain(!uploadAgain) }}>
                         <Text style={styles.label}>Upload Photo Again?</Text>
                       </TouchableOpacity></View>
                     </View>
                   ) : null}
-
-
-
-                  {/* <View
-                    style={styles.inputContainer}
-                  >
-                    <Text style={styles.label}>Visitor Email</Text>
-                    <TextInput
-                      style={styles.input}
-                      onChangeText={handleChange("email_id")}
-                      onBlur={handleBlur("email_id")}
-                      value={values.email_id}
-                      placeholder="Visitor Email"
-                    />
-                    <Text style={styles.errorTxt}>
-                      {touched.email_id && errors.email_id
-                        ? errors.email_id
-                        : null}
-                    </Text>
-                  </View> */}
-
-                  {/* <View
-                    style={styles.inputContainer}
-                  >
-                    <Text style={styles.label}> Visitor Contact Number</Text>
-                    <TextInput
-                      style={styles.input}
-                      onChangeText={handleChange("contact_number")}
-                      onBlur={handleBlur("contact_number")}
-                      value={values.contact_number}
-                      placeholder="Visitor Contact Number"
-                    />
-                    <Text style={styles.errorTxt}>
-                      {touched.contact_number && errors.contact_number
-                        ? errors.contact_number
-                        : null}
-                    </Text>
-                  </View> */}
-
-
-
-                  <View
-                    style={styles.inputContainer}
-                  >
-                    <Text style={styles.label}>Select Your Id</Text>
-                    <Dropdown
-                      style={styles.dropdown}
-                      placeholderStyle={styles.placeholderStyle}
-                      selectedTextStyle={styles.selectedTextStyle}
-                      iconStyle={styles.iconStyle}
-                      data={ID_OPTIONS}
-                      maxHeight={300}
-                      labelField="label"
-                      valueField="value"
-                      placeholder="Select an ID"
-                      value={id}
-                      onChange={(item) => {
-                        setId(item.value);
-                      }}
-                      renderLeftIcon={() => (
-                        <AntDesign
-                          style={styles.icon}
-                          color="black"
-                          name="Safety"
-                          size={20}
-                        />
-                      )}
-                    />
-                    <Text style={styles.errorTxt}>{``}</Text>
+                 { <View style={styles.inputContainer}>
+                    <View><Text style={styles.label}>Visitors ID</Text></View>
+                    <View style={styles.field}>
+                      <Image
+                        style={styles.image}
+                        source={{ uri: `https://iammaven.com/v1.0/visitor/image/${idimage}` }}
+                      />
+                    </View>
                   </View>
+}
+
 
                   <View
                     style={styles.inputContainer}
@@ -869,7 +828,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
                         : null} */}
                     </Text>
                   </View>
-                  <View
+                  {/* <View
                     style={styles.inputContainer}
                   >
                     <Text style={styles.label}>Enter Address</Text>
@@ -885,7 +844,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
                         ? errors.address
                         : null}
                     </Text>
-                  </View>
+                  </View> */}
                   {/* {!data.pic &&!clicked && <TouchableOpacity
                     style={styles.buttonupload}
                     onPress={() => {navigation.navigate('UserUploadProfile'), setClicked(!clicked)}}
