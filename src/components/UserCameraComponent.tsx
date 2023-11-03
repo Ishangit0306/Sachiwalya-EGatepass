@@ -16,7 +16,7 @@ import {
   }
   
   const UserCameraComponent = ({ sendPhotoToNextScreen,route }: any) => {
-    console.log("routeincamera",route);
+   
     const cameraRef = useRef<any>(null);
   
     const [type, setType] = useState(CameraType.back);

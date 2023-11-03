@@ -196,7 +196,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
         const mid = entry.tm_mid; // Move the mid declaration inside the loop
 
         // Check if employee is not empty
-        if (employee && employee.trim().toUpperCase() !== "NA") {
+        if (employee) {
           designationData.push(`${designation} (${employee})`);
 
         } else {
@@ -230,7 +230,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
       res.data.forEach((entry: any) => {
         const designation = entry.designation;
         const employee = entry.employee;
-        if (designation && designation.trim().toUpperCase() !== "NA") {
+        if (designation ) {
           officerData.push(`${employee} (${designation})`);
         } else {
           officerData.push(designation);

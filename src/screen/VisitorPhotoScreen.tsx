@@ -25,6 +25,7 @@ import { bookAppointmentFormApi } from "../utils/api";
 import { smsStatus } from "../stores/authentication/slice";
 import { sendSMSToVisitor } from "../utils/sms";
 import { API_BASE_URL, ROLE_TYPE_EMPLOYEE, ROLE_TYPE_PASSOFFICE, ROLE_TYPE_SECURITY } from "../utils/config";
+import ConfirmationScreen from "./ConfirmationScreen";
 
 const VisitorPhotoScreen = ({ navigation, route }: any) => {
   const { params } = route;
@@ -32,10 +33,11 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
   const documentImgData = useAppSelector(getDocumentScannedPhoto);
   const visitorImgData = useAppSelector(getVisitorScannedPhoto);
   const visitorData = useAppSelector(getVisitorsList);
+  const authState: any = useAppSelector(selectAuthenticated);
   const [disabledUploadButton, setDisabledUploadButton] =
     useState<boolean>(false);
   const dispatch = useAppDispatch();
-
+  const {  user: { etype, eid } }: any = authState;
   const [isVisitorPhotoTaken, setIsVisitorPhotoTaken] =
     useState<boolean>(false);
 
@@ -220,16 +222,13 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
   
     let msg: any;
     const empName = 'Evon Tech'
-
     if (role === ROLE_TYPE_SECURITY || role===ROLE_TYPE_PASSOFFICE) {
+
       msg = `Namaste ${name}! Your request for an appointment  with ${empName}, ${dept}, Uttarakhand government, is being processed!`;
     } else {
       msg = `Namaste ${name}! Congratulations, your request for an appointment  with ${empName}, ${dept}, Uttarakhand government, has been approved! On arrival, please click on the link below and show the QR code to the Security: ${API_BASE_URL}/oldvisitor/qrcode/${phNo}`;
     }
-
-    //msg = `Namaste ${name}! Your request for an appointment at ${time} hrs on ${date} with ${empName}, ${dept}, Uttarakhand government, is being processed!`;
-  
-    sendSMSToVisitor(phNo, msg);
+    //sendSMSToVisitor(phNo, msg);
   }
   
   const uploadAllAppointmentFormData = async () => {
@@ -270,6 +269,12 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
     } else {
       roleId = 2;
     }
+    // let eid;
+    // if (role === ROLE_TYPE_SECURITY ||role==ROLE_TYPE_PASSOFFICE) {
+    //   eid = 5;
+    // } else {
+    //   eid = 2;
+    // }
 
     let formStoreData = {
       name: fullName,
@@ -289,9 +294,10 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
       designation_d_name:params?.designation_d_name,
       designation_did:params?.designation_did,
       designation_name:params?.designation_name,
-      officer_did:params?.officer_name,
+      officer_did:params?.officer_did,
       officer_name:params?.officer_name,
-      officer_o_name:params?.officer_o_name
+      officer_o_name:params?.officer_o_name,
+      submitted_by:eid
     };
 
 
@@ -317,6 +323,7 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
     formData.append("officer_name",formStoreData.officer_name);
     formData.append("officer_o_name",formStoreData.officer_o_name);
     formData.append("officer_did",formStoreData.officer_did);
+    formData.append("submitted_by",formStoreData.submitted_by);
 
     console.log('my form data>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#########################', formStoreData);
 
@@ -359,21 +366,8 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
         // }));
         // sendSMSToVisitor(formSubmission.data.phNo, formSubmission.data.id);
 
-        sendAppointmentSMS(role, formSubmission)
-        // if (role === "security") {
-        //   const msg: any = `Namaste ${formSubmission.data.name}! 
-        //   Your request for an appointment at ${formSubmission.data.time} hrs on ${formSubmission.data.date} with ${formSubmission.data.empId}, 
-        //   ${formSubmission.data.dept}, Uttarakhand government, is being processed! `;
-        //   sendSMSToVisitor(formSubmission.data.phNo, msg);
-        // }
-        // else {
-        //   const msg: any = `Namaste ${formSubmission.data.name}! 
-        //                     Congratulations, your request for an appointment at ${formSubmission.data.time} hrs on ${formSubmission.data.date} with ${formSubmission.data.empId}, 
-        //                     ${formSubmission.data.dept}, Uttarakhand government,has been approved!  
-        //                     On arrival, please click on the link below and show the QR code to the Security: https://iammaven.com/users/qrcode/${formSubmission.data.idNo}`;
-        //   sendSMSToVisitor(formSubmission.data.phNo, msg);
-        // }
-
+        //sendAppointmentSMS(role, formSubmission)
+  
         if (role === ROLE_TYPE_SECURITY) {
           navigation.navigate("SecurityDashboard");
         }

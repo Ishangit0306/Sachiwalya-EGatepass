@@ -39,7 +39,8 @@ export interface User {
   departmentId?: string | number;
   edesignation?:string,
   fk_eid_caters?:string|number,
-  ephone?:string
+  ephone?:string,
+  eid?:string|number
 }
 
 export interface LoginValues {

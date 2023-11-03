@@ -165,19 +165,26 @@ export const fetchUserDetail = async (token: string) => {
 type GET_VISITOR_API = {
   token: string;
   role: TYPE_EMPLOYER | TYPE_SECURITY | TYPE_ADMIN | TYPE_PASSOFFICE;
+  etype:number|null;
+  eid:number|null;
+  archive:number|null;
 };
-export const getVisitorsListApi = async ({ token, role }: GET_VISITOR_API) => {
+export const getVisitorsListApi = async ({ token, role ,etype,eid,archive}: GET_VISITOR_API) => {
   let API_URL_VISITOR;
 
-  if (role === ROLE_TYPE_SECURITY || role === ROLE_TYPE_PASSOFFICE ) {
-    API_URL_VISITOR = `${API_BASE_URL}/oldvisitor/getTodayRecord`;
-  } else if (role === ROLE_TYPE_EMPLOYEE) {
-    API_URL_VISITOR = `${API_BASE_URL}/oldvisitor/getEmployeeRecord`;
-  }
-  console.log(
-    'current url will be hit for visitor>>>>>>>>>>>>>>>>>>>>>>',
-    API_URL_VISITOR
-  );
+  // if (role === ROLE_TYPE_SECURITY || role === ROLE_TYPE_PASSOFFICE ) {
+  //   API_URL_VISITOR = `${API_BASE_URL}/oldvisitor/getTodayRecord`;
+
+  // } else if (role === ROLE_TYPE_EMPLOYEE) {
+  //   API_URL_VISITOR = `${API_BASE_URL}/v1.0/user/get-visitor-list/${eid}/${etype}/no/no/no/no/${archive}`
+  //   //API_URL_VISITOR = `${API_BASE_URL}/oldvisitor/getTodayRecord`
+  // }
+  API_URL_VISITOR = `${API_BASE_URL}/v1.0/user/get-visitor-list/${eid}/${etype}/no/no/no/no/${archive}`
+  // console.log(
+  //   'current url will be hit for visitor>>>>>>>>>>>>>>>>>>>>>>',
+  //   API_URL_VISITOR
+  // );
+
   const response = await fetch(`${API_URL_VISITOR}`, {
     method: 'GET',
     headers: {
@@ -188,10 +195,9 @@ export const getVisitorsListApi = async ({ token, role }: GET_VISITOR_API) => {
   });
 
   const data = await response.json();
-
   if (response.ok) {
     return {
-      data: data,
+      data: data?.data?.list,
       message: 'success',
       statusCode: 200,
       error: false,
@@ -877,7 +883,7 @@ export const officerName = async (dept:any,designation:any) => {
           },
       });
       const resData = await response.json();
-         //console.log('desigantionapi',resData);
+         console.log('desigantionapi',resData);
       if (response.ok) {
           return {
               data: resData.data.list,

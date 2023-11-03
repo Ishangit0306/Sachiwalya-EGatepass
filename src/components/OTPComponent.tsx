@@ -28,8 +28,8 @@ const loginValidationSchema = yup.object().shape({
     // email: yup.string().email('Invalid email').required('Email is required'),
     //organizationName: yup.string().required('Please select Organization'),
     otpNumber: yup.string()
-        .required('ENTER YOUR 4 DIGIT OTP NUMBER')
-        .min(4, 'Otp Number must be at least 4 characters'),
+        .required('ENTER YOUR 6 DIGIT OTP NUMBER')
+        .min(6, 'Otp Number must be at least 6 number'),
 });
 
 const ID_OPTIONS = [
@@ -156,7 +156,7 @@ const[dbuser,setDbuser]=useState(false);
                        </>):
                        ( <>
                             {!isShowUploadButton ? (<View style={styles.inputContainer}>
-                                <Text style={styles.label}>ENTER YOUR 4 DIGIT OTP NUMBER</Text>
+                                <Text style={styles.label}>ENTER YOUR 6 DIGIT OTP NUMBER</Text>
                                 <TextInput
                                     style={styles.input}
                                     onChangeText={handleChange('otpNumber')}
@@ -218,7 +218,7 @@ const[dbuser,setDbuser]=useState(false);
 
                     {isShowUploadButton ? (<TouchableOpacity
                         onPress={() => {
-                            showToast();
+        
                             handleUploadID();
                         }}
                         // onPress={() =>

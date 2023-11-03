@@ -133,7 +133,7 @@ const Item = ({
 );
 const EmployeeListScreen = ({ navigation }: any) => {
   const [selectedId, setSelectedId] = useState<string>();
-  const authState = useAppSelector(selectAuthenticated);
+  const authState: any = useAppSelector(selectAuthenticated);
   const [visitorData, setVisitorData] = useState<any>([]);
   const [pendingStatus, setPendingStatus] = useState("In Progress");
   const [isModalVisible, setModalVisible] = useState(false);
@@ -156,14 +156,14 @@ const EmployeeListScreen = ({ navigation }: any) => {
       setSelectorVisitorId(visitorId);
     }
   };
-//console.log('itemobj',itemObj);
+  //console.log('itemobj',itemObj);
   const _drawerOpenClose = () => {
     setModalVisible(false);
   };
 
   //modal end
   const renderItem = ({ item }: { item: any }) => {
-    console.log('item',item);
+    console.log('item', item);
     const backgroundColor = item?.id === selectedId ? "#cce5ff" : "#f2f2f2";
     const color = item?.id === selectedId ? "blue" : "black";
     const formattedDate = moment(item.date).format('YYYY-MM-DD');
@@ -180,19 +180,29 @@ const EmployeeListScreen = ({ navigation }: any) => {
     );
   };
 
+  const [activeTab, setActiveTab] = React.useState(2);
+  const handleTabPress = (tabIndex: any) => {
+    setActiveTab(tabIndex);
+    toggleButtonState();
+  };
+
   useFocusEffect(
     React.useCallback(() => {
-      const { token, role }: any = authState;
+      console.log("active",activeTab);
+      const { token, role, user: { etype, eid } }: any = authState;
       const fetchLeaderBoardData = async () => {
         try {
           const resData = await getVisitorsListApi({
             token: token,
             role: role,
+            etype: etype,
+            eid: eid,
+            archive:activeTab
           });
 
           if (resData.statusCode === 200 || resData.statusCode === 201) {
             const data = resData.data;
-            //console.log('data update',data);
+            console.log('data update', data);
             setVisitorData(data);
             // setIsLoading(false);
           }
@@ -202,7 +212,7 @@ const EmployeeListScreen = ({ navigation }: any) => {
       };
 
       fetchLeaderBoardData();
-    }, [isModalVisible])
+    }, [isModalVisible,activeTab])
   );
 
   const statusUpdateClick = async (status: "Approved" | "Rejected") => {
@@ -223,7 +233,7 @@ const EmployeeListScreen = ({ navigation }: any) => {
         status: status_id,
         token: authState?.token,
       });
-       //console.log("res from update ai",data);
+      //console.log("res from update ai",data);
       if (data.statusCode === 201) {
         setModalVisible(false);
       }
@@ -231,67 +241,64 @@ const EmployeeListScreen = ({ navigation }: any) => {
     //const empName = "Evon Tech";
     if (status === "Approved") {
       const msg: any = `Namaste ${itemObj.name}! Congratulations, your request for an appointment with ${itemObj.ename}, ${itemObj.dept}, Uttarakhand government,has been approved! On arrival, please click on the link below and show the QR code to the Security: ${API_BASE_URL}/oldvisitor/qrcode/${itemObj.phno}`;
-      sendSMSToVisitor(itemObj.phno, msg);
+    //sendSMSToVisitor(itemObj.phno, msg);
     } else if (status === "Rejected") {
       const msg: any = `Namaste ${itemObj.name}! Unfortunately, your request for an appointment   with ${itemObj.ename}, ${itemObj.dept}, Uttarakhand government, has been rejected!`
-      sendSMSToVisitor(itemObj.phno, msg);
+   //sendSMSToVisitor(itemObj.phno, msg);
     }
   };
-//console.log('visitordara',visitorData);
-const filteredItemsArray = visitorData.filter((item:any) => {
-  const currentTime = new Date();
-  return (
-    item.date && new Date(item.date).toDateString() !== currentTime.toDateString() || item.isapproved !== 0 || new Date(item.date).toDateString() > currentTime.toDateString()
-  );
-});
-console.log('filteritem',filteredItemsArray);
-const[isButtonActive,setIsButtonActive]=useState<any>(false)
-const filteredArray = visitorData.filter((item:any) => !filteredItemsArray.includes(item));
-const toggleButtonState = () => {
-  setIsButtonActive(!isButtonActive);
-};
+  //console.log('visitordara',visitorData);
+  // const filteredItemsArray = visitorData.filter((item:any) => {
+  //   const currentTime = new Date();
+  //   return (
+  //     item.date && new Date(item.date).toDateString() !== currentTime.toDateString() || item.isapproved !== 0 || new Date(item.date).toDateString() > currentTime.toDateString()
+  //   );
+  // });
+  // console.log('filteritem',filteredItemsArray);
+  const [isButtonActive, setIsButtonActive] = useState<any>(false)
+  //const filteredArray = visitorData.filter((item:any) => !filteredItemsArray.includes(item));
+  const toggleButtonState = () => {
+    setIsButtonActive(!isButtonActive);
+  };
 
-const [activeTab, setActiveTab] = React.useState(0);
-const handleTabPress = (tabIndex:any) => {
-  setActiveTab(tabIndex);
-  toggleButtonState(); 
-};
+  
   return (
     <SafeAreaView style={styles.container}>
       <View>
-   
 
-<View style={{ flexDirection: 'row' }}>
-      <TouchableOpacity
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: activeTab === 0 ? 'blue' : 'gray',
-        }}
-        onPress={() => handleTabPress(0)}
-        disabled={activeTab === 0}
-      >
-        <Text style={{ color: 'white' }}>Upcoming/Today's Visits</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: activeTab === 1 ? 'blue' : 'gray',
-        }}
-        onPress={() => handleTabPress(1)}
-        disabled={activeTab === 1}
-      >
-        <Text style={{ color: 'white' }}>Archived Visits</Text>
-      </TouchableOpacity>
-    </View>
-       {/* <TabButton title="Tab 1" isActive={activeTab === 1} onPress={() => handleTabPress(1)} />
+
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: activeTab === 2 ? 'blue' : 'gray',
+            }}
+            onPress={() => handleTabPress(2)}
+            disabled={activeTab === 2}
+          >
+            <Text style={{ color: 'white' }}>Upcoming/Today's Visits</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: activeTab === 3 ? 'blue' : 'gray',
+            }}
+            onPress={() => handleTabPress(3)}
+            disabled={activeTab === 3}
+          >
+            <Text style={{ color: 'white' }}>Archived Visits</Text>
+          </TouchableOpacity>
+        </View>
+        {/* <TabButton title="Tab 1" isActive={activeTab === 1} onPress={() => handleTabPress(1)} />
       <TabButton title="Tab 2" isActive={activeTab === 2} onPress={() => handleTabPress(2)} /> */}
-    </View>
+      </View>
       <FlatList
-        data={isButtonActive?filteredItemsArray:filteredArray}
+        data={visitorData}
+        //data={isButtonActive?filteredItemsArray:filteredArray}
         renderItem={renderItem}
         keyExtractor={(item, index): any => index}
         extraData={selectedId}
@@ -306,46 +313,46 @@ const handleTabPress = (tabIndex:any) => {
           onRequestClose={() => setModalVisible(false)}
         >
           <ScrollView>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-            <View style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: 'center'
-              }}>
-               
-                <Text style={styles.modalText}>
-                  Do you want to approve or reject?
-                </Text>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: 'center'
+                }}>
 
-                <IconButton style={{ marginBottom: 20 }} onPress={_drawerOpenClose} icon="close-circle" />
-              </View>
-            <View style={[styles.textWrap]}>
-      <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
-        Visitor Name:
-      </Text>
-      <Text style={styles.textRight}>{itemObj?.name}</Text>
-    </View>
-    <View style={[styles.textWrap]}>
-      <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
-        Purpose:
-      </Text>
-      <Text style={styles.textRight}>{itemObj?.purpose}</Text>
-    </View>
+                  <Text style={styles.modalText}>
+                    Do you want to approve or reject?
+                  </Text>
 
-    <View style={[styles.textWrap]}>
-      <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
-       Whom To Meet:
-      </Text>
-      <Text style={styles.textRight}>{itemObj?.ename}</Text>
-    </View>
-    <View style={[styles.textWrap]}>
-      <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
-       Department:
-      </Text>
-      <Text style={styles.textRight}>{itemObj?.edepartment}</Text>
-    </View>
-    {/* <View style={[styles.textWrap]}>
+                  <IconButton style={{ marginBottom: 20 }} onPress={_drawerOpenClose} icon="close-circle" />
+                </View>
+                <View style={[styles.textWrap]}>
+                  <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
+                    Visitor Name:
+                  </Text>
+                  <Text style={styles.textRight}>{itemObj?.name}</Text>
+                </View>
+                <View style={[styles.textWrap]}>
+                  <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
+                    Purpose:
+                  </Text>
+                  <Text style={styles.textRight}>{itemObj?.purpose}</Text>
+                </View>
+
+                <View style={[styles.textWrap]}>
+                  <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
+                    Whom To Meet:
+                  </Text>
+                  <Text style={styles.textRight}>{itemObj?.ename}</Text>
+                </View>
+                <View style={[styles.textWrap]}>
+                  <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
+                    Department:
+                  </Text>
+                  <Text style={styles.textRight}>{itemObj?.edepartment}</Text>
+                </View>
+                {/* <View style={[styles.textWrap]}>
       <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
        Appointment Date:
       </Text>
@@ -357,33 +364,33 @@ const handleTabPress = (tabIndex:any) => {
       </Text>
       <Text style={styles.textRight}>{itemObj?.time}</Text>
     </View> */}
-    <View style={[styles.textWrap]}>
-      <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
-       Phone No.:
-      </Text>
-      <Text style={styles.textRight}>{itemObj?.phno}</Text>
-    </View>
+                <View style={[styles.textWrap]}>
+                  <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
+                    Phone No.:
+                  </Text>
+                  <Text style={styles.textRight}>{itemObj?.phno}</Text>
+                </View>
 
-    <View style={styles.textWrap}>
-          <Text style={[styles.textLeft, { fontWeight: "bold" }]}>Visitor Photo </Text>
-          
-          <Image
-            style={styles.image}
-            source={{ uri: `${API_BASE_URL}/v1.0/visitor/image/${itemObj.profile_pic}` }}
-          />
-        </View>
+                <View style={styles.textWrap}>
+                  <Text style={[styles.textLeft, { fontWeight: "bold" }]}>Visitor Photo </Text>
 
-        {itemObj.id_pic != "null" && itemObj.id_pic != null && itemObj ? (
-          <View style={styles.textWrap}>
-            <Text style={[styles.textLeft, { fontWeight: "bold" }]}>Visitor Id Photo</Text>
-            <Image
-              style={styles.image}
-              source={{ uri: `${API_BASE_URL}/v1.0/visitor/image/${itemObj.id_pic}` }}
-            />
-          </View>
-        ) : null}
-    
-              {/* <View style={{
+                  <Image
+                    style={styles.image}
+                    source={{ uri: `${API_BASE_URL}/v1.0/visitor/image/${itemObj.profile_pic}` }}
+                  />
+                </View>
+
+                {itemObj.id_pic != "null" && itemObj.id_pic != null && itemObj ? (
+                  <View style={styles.textWrap}>
+                    <Text style={[styles.textLeft, { fontWeight: "bold" }]}>Visitor Id Photo</Text>
+                    <Image
+                      style={styles.image}
+                      source={{ uri: `${API_BASE_URL}/v1.0/visitor/image/${itemObj.id_pic}` }}
+                    />
+                  </View>
+                ) : null}
+
+                {/* <View style={{
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: 'center'
@@ -395,22 +402,22 @@ const handleTabPress = (tabIndex:any) => {
 
                 <IconButton style={{ marginBottom: 20 }} onPress={_drawerOpenClose} icon="close-circle" />
               </View> */}
-              <View style={styles.modalButtons}>
-                <TouchableOpacity
-                  style={[styles.modalButton, { backgroundColor: "#28a745" }]}
-                  onPress={() => statusUpdateClick("Approved")}
-                >
-                  <Text style={styles.modalButtonText}>Approve</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.modalButton, { backgroundColor: "#dc3545" }]}
-                  onPress={() => statusUpdateClick("Rejected")}
-                >
-                  <Text style={styles.modalButtonText}>Reject</Text>
-                </TouchableOpacity>
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={[styles.modalButton, { backgroundColor: "#28a745" }]}
+                    onPress={() => statusUpdateClick("Approved")}
+                  >
+                    <Text style={styles.modalButtonText}>Approve</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalButton, { backgroundColor: "#dc3545" }]}
+                    onPress={() => statusUpdateClick("Rejected")}
+                  >
+                    <Text style={styles.modalButtonText}>Reject</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
           </ScrollView>
         </Modal>
       </View>
