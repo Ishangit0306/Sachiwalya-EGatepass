@@ -1,28 +1,36 @@
-import { Button, Image, StyleSheet, Text, TextInput, View, ScrollView } from "react-native";
-import React from "react";
+import {
+  Button,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  ScrollView,
+} from "react-native";
+import React, { useEffect } from "react";
 import { Headline, PaperProvider } from "react-native-paper";
 import { API_BASE_URL } from "../utils/config";
-import moment from 'moment-timezone';
-
+import moment from "moment-timezone";
+import { updateqrscan } from "../utils/api";
 
 const QRdisplayScreen = ({ navigation, route }: any) => {
   const { params } = route;
   const data = JSON.parse(params.Qrdata);
-  const formattedDate = moment(data?.date).format('YYYY-MM-DD');
+  const formattedDate = moment(data?.date).format("YYYY-MM-DD");
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending':
-        return 'orange';
-      case 'approved':
-        return 'green';
-      case 'rejected':
-        return 'red';
+      case "pending":
+        return "orange";
+      case "approved":
+        return "green";
+      case "rejected":
+        return "red";
       default:
-        return 'unknown';
+        return "unknown";
     }
   };
 
-  console.log('qrscreen',data);
+  console.log("qrscreen", data);
   let status = data.isapproved;
   if (status == 1) {
     status = "Approved";
@@ -31,18 +39,24 @@ const QRdisplayScreen = ({ navigation, route }: any) => {
   } else {
     status = "Pending";
   }
-  console.log(data,"in display");
-  console.log('url',`${API_BASE_URL}/v1.0/${data.id_pic}`)
+  console.log(data, "in display");
+  console.log("url", `${API_BASE_URL}/v1.0/${data.id_pic}`);
+  useEffect(() => {
+    if (data) {
+      updateqrscan(data.phno,data.date);
+    }
+  }, []);
   return (
     <View style={{}}>
       <ScrollView style={styles.container}>
-
-      <View style={styles.field}>
+        <View style={styles.field}>
           <Text style={styles.label}>Visitor Photo </Text>
-          
+
           <Image
             style={styles.image}
-            source={{ uri: `${API_BASE_URL}/v1.0/visitor/image/${data.uphoto}` }}
+            source={{
+              uri: `${API_BASE_URL}/v1.0/visitor/image/${data.uphoto}`,
+            }}
           />
         </View>
 
@@ -51,7 +65,9 @@ const QRdisplayScreen = ({ navigation, route }: any) => {
             <Text style={styles.label}>Visitor Id Photo</Text>
             <Image
               style={styles.image}
-              source={{ uri: `${API_BASE_URL}/v1.0/visitor/image/${data.id_pic}` }}
+              source={{
+                uri: `${API_BASE_URL}/v1.0/visitor/image/${data.id_pic}`,
+              }}
             />
           </View>
         ) : null}
@@ -72,9 +88,7 @@ const QRdisplayScreen = ({ navigation, route }: any) => {
 
         <View style={styles.field}>
           <Text style={styles.label}>Whom To Meet:</Text>
-          <Text style={styles.value}>
-            {data?.ename}
-          </Text>
+          <Text style={styles.value}>{data?.ename}</Text>
         </View>
 
         <View style={styles.field}>
@@ -93,16 +107,22 @@ const QRdisplayScreen = ({ navigation, route }: any) => {
 
         <View style={styles.field}>
           <Text style={styles.label}>Status</Text>
-          <Text style={[styles.value, {
-            color: getStatusColor(status)
-          }]}>{status}</Text>
+          <Text
+            style={[
+              styles.value,
+              {
+                color: getStatusColor(status),
+              },
+            ]}
+          >
+            {status}
+          </Text>
         </View>
 
         <View style={styles.field}>
           <Text style={styles.label}>Phone No:</Text>
           <Text style={styles.value}>{data?.uphone}</Text>
         </View>
-
       </ScrollView>
     </View>
   );

@@ -275,7 +275,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
   const validationSchema = Yup.object().shape({
     visitername: Yup.string().required('Name is required'),
     //visit_purpose: Yup.string().required('Purpose of visit is required'),
-    meeting_purpose: Yup.string().required('Purpose of meeting is required'),
+    meeting_purpose: Yup.string(),
     //email_id: Yup.string().email('Invalid email'),
     //contact_number: Yup.string().required(' Visitor Contact number is required'),
     date: Yup.string().required('Date field is required'),
@@ -759,7 +759,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
                       />
                     </View>
                   </View>
-                  <View
+           { (selectedPurpose==='Others')&&  <View
                     style={styles.inputContainer}
                   >
                     <Text style={styles.label}>Purpose of Meeting</Text>
@@ -770,12 +770,12 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
                       value={ values.meeting_purpose}
                       placeholder="Purpose of Meeting"
                     />
-                    <Text style={styles.errorTxt}>
+                    {/* <Text style={styles.errorTxt}>
                       {touched.meeting_purpose && errors.meeting_purpose
                         ? errors.meeting_purpose
                         : null}
-                    </Text>
-                  </View>
+                    </Text> */}
+                  </View>}
 
                   {!data.pic && (!clicked || !imageUri) && <TouchableOpacity
                     style={styles.buttonupload}

@@ -69,15 +69,15 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
     formatTime(new Date())
   );
 
-  useEffect(()=>{
-    if(role==ROLE_TYPE_EMPLOYEE)
-    {
+  // useEffect(()=>{
+  //   if(role==ROLE_TYPE_EMPLOYEE)
+  //   {
 
-    setDpt(24);
-    setDesig(5773);
-    setEmpid(5710);
-    }
-  },[])
+  //   setDpt(24);
+  //   setDesig(5773);
+  //   setEmpid(5710);
+  //   }
+  // },[])
   const [departmentData, setDepartmentData] = useState([]);
 
   useEffect(() => {

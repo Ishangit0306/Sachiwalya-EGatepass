@@ -91,14 +91,14 @@ const Item = ({
             Whom to Meet:
           </Text>
           <Text style={styles.textRight}>
-            {item && item?.empName ? item.empName : "Evon Tech"}
+            {item && item?.ename ? item.ename : "Evon Tech"}
           </Text>
         </View>
         <View style={[styles.textWrap]}>
           <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
             Department:
           </Text>
-          <Text style={styles.textRight}>{item?.dept}</Text>
+          <Text style={styles.textRight}>{item?.edepartment}</Text>
         </View>
       </>
     )}

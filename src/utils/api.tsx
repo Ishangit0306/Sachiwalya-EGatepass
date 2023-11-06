@@ -950,3 +950,45 @@ export const scannedUserDocumentApi = async (data: FormData) => {
     };
   }
 };
+
+
+export const updateqrscan = async (data: any,date:any) => {
+
+const requestBody={
+  date:date
+}
+console.log(JSON.stringify(requestBody));
+  try {
+    console.log('base url', API_BASE_URL);
+    const response = await fetch(`${API_BASE_URL}/v1.0/visitor/update-qrscan-date/${data}/1`, {
+      method: 'PATCH',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    });
+    const resData = await response.json(); 
+    if (!response.ok) {
+      return {
+        validate: false,
+        statusCode: 404,
+        message: resData.message
+      }
+    }
+
+    if (response.status === 200 || response.status === 201) {
+
+      
+    }
+    else {
+     
+    }
+  } catch (error) {
+    return {
+      statusCode: 404,
+      message: error,
+    }
+  }
+
+}
