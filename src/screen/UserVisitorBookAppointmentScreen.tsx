@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Platform, BackHandler } from "react-native";
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Platform, BackHandler, Alert } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import Icons from "../constants/Icons";
 import { Dropdown } from "react-native-element-dropdown";
@@ -79,9 +79,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
   console.log('paramsinuservisitor', params.authdata);
   const { name, address, visitorId } = params?.authdata ? params.authdata : null;
   const { doctype, id_pic, upload_image_id } = params?.authdata ? params.authdata : null;
-  console.log('doctypw', doctype);
-  console.log('id', upload_image_id);
-  console.log('pci', id_pic);
+
   const formData = params?.formData;
   //console.log(formData?._parts[0][1].uri);
   params = params ?? JSON.stringify(params);
@@ -108,7 +106,6 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
   const [isloading, setisloading] = useState(true);
 
   const data = useAppSelector(getUserInfo);
-  console.log('datacoming',data);
   const idimage=id_pic??data.idpic
   //console.log('Reduxdata',data);
   const [id, setId] = useState<any>(1); // doc id
@@ -380,11 +377,20 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
 
 
     setSubmitting(false);
-    const response = data.uid && !uploadAgain ? await saveUserApi(formdata) : await saveUserApi(formData);
-    console.log('api response', response);
-
-    const cameraScreenData = { ...formdata, "imgFor": "userprofile" }
-    navigation.navigate("ConfirmationScreen", cameraScreenData);
+    try {
+      const response = data.uid && !uploadAgain
+        ? await saveUserApi(formdata)
+        : await saveUserApi(formData);
+    
+      // Handle the successful API response here
+      const cameraScreenData = { ...formdata, "imgFor": "userprofile" };
+      navigation.navigate("ConfirmationScreen", cameraScreenData);
+    } catch (error) {
+      // Handle exceptions (errors) that occurred during the API call
+      Alert.alert("API call failed");
+      console.error("API call failed:", error);
+      // You can display an error message to the user or take other appropriate actions.
+    }
     // if (id === 4 || id === "none") {
     //   navigation.navigate("AppointmentFormScreen", {...formdata, "isSimpleForm": true});
     // } else {
@@ -799,7 +805,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
                       </TouchableOpacity></View>
                     </View>
                   ) : null}
-                 { <View style={styles.inputContainer}>
+                 {idimage && <View style={styles.inputContainer}>
                     <View><Text style={styles.label}>Visitors ID</Text></View>
                     <View style={styles.field}>
                       <Image

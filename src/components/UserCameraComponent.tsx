@@ -25,15 +25,23 @@ import {
     const [photo, setPhoto] = useState<any>();
     const [isButton, setIsButton] = useState<boolean>(false);
   
+
+    useEffect(()=>{
+      if(!hasPermission)
+      {
+        runOpenCamera()
+      }   
+      },[hasPermission])
+
     useEffect(() => {
       (async () => {
         if (openCamera) {
           const cameraPermission = await Camera.requestCameraPermissionsAsync();
           const { granted, status } = cameraPermission;
-          setHasPermission(true);
-          // if (granted) {
-          //   setHasPermission(true);
-          // }
+          //setHasPermission(true);
+          if (granted) {
+            setHasPermission(true);
+          }
         } else {
           setHasPermission(false);
         }
@@ -128,12 +136,16 @@ import {
     }
   
 
-    if (openCamera) {
-        runOpenCamera();
-      }
+    // if (openCamera) {
+    //     runOpenCamera();
+    //   }
+
+
+    
+    console.log("has",hasPermission);
     return (
       <>
-        {!hasPermission ? (
+        {hasPermission ? (
           <Camera ref={cameraRef} type={type} style={styles.camera}>
             <View style={styles.buttonContainer}>
               <View
@@ -179,15 +191,13 @@ import {
             </View>
           </Camera>
         ) : (
-        //   <View style={styles.container}>
-        //     <TouchableOpacity style={styles.buttonOpn} onPress={runOpenCamera} >
-        //       <Text style={styles.buttonText}>Click Photo</Text>
-        //     </TouchableOpacity>
-        //   </View>
-        useEffect(()=>{
-       runOpenCamera()
-        },[])
-      
+          // <View style={styles.container}>
+          //   <TouchableOpacity style={styles.buttonOpn} onPress={runOpenCamera} >
+          //     <Text style={styles.buttonText}>Click Photo</Text>
+          //   </TouchableOpacity>
+          // </View>
+         <>
+         </>
         )}
       </>
     );

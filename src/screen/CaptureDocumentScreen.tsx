@@ -33,7 +33,7 @@ const CaptureDocumentScreen = ({ navigation, route }: any) => {
 
     if (photo) {
       let formData = new FormData();
-      formData.append("typeOfId", 3);
+      formData.append("typeOfId", params.documentType);
 
       console.log("datataa", formData);
       const ext = mydata.uri.substring(mydata.uri.lastIndexOf(".") + 1);

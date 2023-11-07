@@ -67,6 +67,18 @@ const OTPComponent = ({ navigation, otp ,formdata}: any) => {
         }
 
 useEffect(()=>{
+
+    if(dropid==4)
+    {
+        navigation.navigate('UserRegistration', { mobile, authdata:{name:"",visitorId:"",doctype:dropid, upload_image_id:"",id_pic:""} });
+    }
+
+
+},[dropid])
+
+
+
+useEffect(()=>{
     if(formdata?.formData)
     {
             let form = new FormData();
@@ -129,6 +141,7 @@ const[dbuser,setDbuser]=useState(false);
         setSubmitting(false);
     };
     const handleUploadID = () => {
+      
         navigation.navigate('UserUploadProfile', { mobile,isUserID:true,otp})
     };
 
