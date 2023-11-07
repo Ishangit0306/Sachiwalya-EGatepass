@@ -1,6 +1,10 @@
+
+
 {
   "expo": {
-    
+    "icon": "./assets/appicon.png",
+    "version": "2.1.0",
+
     "extra": {
       "eas": {
         "projectId": "867e1578-b61b-4c79-8aaf-4c5b306b5052"
