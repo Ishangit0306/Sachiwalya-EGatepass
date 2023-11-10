@@ -6,6 +6,8 @@ import EnterOTPScreen from '../screen/EnterOTPScreen';
 import UserVisitorBookAppointmentScreen from '../screen/UserVisitorBookAppointmentScreen';
 import ConfirmationScreen from '../screen/ConfirmationScreen';
 import UserCapturePhotoScreen from '../screen/UserCapturePhotoScreen';
+import UserDashboardScreen from '../screen/UserDashboardScreen';
+import EmployeeListScreen from '../screen/EmployeeListScreen';
 
 export const Stack = createNativeStackNavigator();
 
@@ -53,6 +55,24 @@ const AuthNavigation = () => {
         options={{ title: 'Confirmation ' }}
       />
 
+      <Stack.Screen
+        name="UserDashboardScreen"
+        component={UserDashboardScreen}
+        options={() => ({
+          headerShown: true,
+          headerTitle: "UserDashboardScreen",
+          headerTitleAlign: "center",
+        })}
+      />
+ <Stack.Screen
+                name="EmployeeListScreen"
+                component={EmployeeListScreen}
+                options={() => ({
+                    headerShown: true,
+                    headerTitle: "Check Pending Status",
+                    headerTitleAlign: "center",
+                })}
+            />
     </Stack.Navigator>
   );
 };

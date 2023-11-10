@@ -56,11 +56,14 @@ interface SecurityBookAppointmentValues {
 }
 
 const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
-
-
+console.log("route",route)
   useEffect(() => {
+    const mobile=route.params.mobile
+    const data={mobile};
+ const phno={data,back:true};
+ console.log("da",phno)
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      navigation.navigate('UserRegister');
+      navigation.navigate('UserDashboardScreen',phno);
       return true; // Return true to prevent the default back action
     });
 
@@ -76,6 +79,7 @@ const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
     }, [uploadAgain]
   )
   let { params } = route;
+  console.log('wholeparam',params);
   console.log('paramsinuservisitor', params.authdata);
   const { name, address, visitorId } = params?.authdata ? params.authdata : null;
   const { doctype, id_pic, upload_image_id } = params?.authdata ? params.authdata : null;

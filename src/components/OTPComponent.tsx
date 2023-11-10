@@ -1,107 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import React, {useState } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, TouchableWithoutFeedback, SafeAreaView, Keyboard, Alert } from 'react-native'
 import { TextInput } from 'react-native-paper';
 import { Formik, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 import { useAppDispatch, useAppSelector } from '../stores/hooks';
-import { authLogin } from '../stores/authentication/userAuthenticate';
-import { fetchUser, scannedUserDocumentApi, verifyOtpApi } from '../utils/api';
-import { resendOtp, sendOtp } from '../stores/otp';
-import { resetUser, storeuser } from '../stores/userdata/slice';
+import { verifyOtpApi } from '../utils/api';
+import { resendOtp} from '../stores/otp';
 import { showToast } from './showToast';
 import { getUserInfo } from '../stores/userdata/selectors';
-import { Dropdown } from "react-native-element-dropdown";
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Loader from './Loader';
-
+import { userloginSuccess } from '../stores/authentication/slice';
 interface LoginFormValues {
-    //organizationName: string;
     otpNumber: string;
 }
 
 const initialValues: LoginFormValues = {
-    //organizationName: '',
     otpNumber: '',
 };
 
 const loginValidationSchema = yup.object().shape({
-    // email: yup.string().email('Invalid email').required('Email is required'),
-    //organizationName: yup.string().required('Please select Organization'),
     otpNumber: yup.string()
         .required('ENTER YOUR 6 DIGIT OTP NUMBER')
         .min(6, 'Otp Number must be at least 6 number'),
 });
 
-const ID_OPTIONS = [
-    { label: "Aadhar", value: 1 },
-    { label: "Voter's ID", value: 2 },
-    { label: "Driving License", value: 3 },
-    { label: "None", value: 4 }
-  
-  ];
 const OTPComponent = ({ navigation, otp ,formdata}: any) => {
-
-    const [isLoading, setIsLoading] = useState(false);
-    const [dropid, setDropid] = useState<any>(1);
-    let userData: any = []
-     
-        const existingUser = async (data: any) => {
-            dispatch(resetUser());
-            const existinguser: any = (await fetchUser(data)).data;
-            userData.push(existinguser);
-            dispatch(storeuser(existinguser));
-            // if(existinguser.uid!=undefined)
-            // {
-               
-            //     navigation.navigate('UserRegistration', { mobile, authdata:userData[0] });
-            // }
-            if(existinguser.uid!=undefined)
-            {
-                return true
-            }
-            else{
-                return false
-            }
-            
-           
-        }
-
-useEffect(()=>{
-
-    if(dropid==4)
-    {
-        navigation.navigate('UserRegistration', { mobile, authdata:{name:"",visitorId:"",doctype:dropid, upload_image_id:"",id_pic:""} });
-    }
-
-
-},[dropid])
-
-
-
-useEffect(()=>{
-    if(formdata?.formData)
-    {
-            let form = new FormData();
-            form.append("typeOfId", dropid);
-            form.append("file",formdata.formData);
-            setIsLoading(true);
-             scannedUserDocumentApi(form).then((data)=>{
-                setIsLoading(false);
-                navigation.navigate('UserRegistration', { mobile, authdata:{name:data.data.name,visitorId:data.data.idNo,doctype:dropid, upload_image_id:data.data.id,id_pic:data.data.id_pic} });
-            });    
-    }
-       
-    
-},[formdata])
-   
- 
- 
-  
-  
-const[dbuser,setDbuser]=useState(false);
-
-    const [isShowUploadButton, setShowUploadButton] = useState(false);
-    //useEffect(()=>{},[isShowUploadButton]);
     const authdata = useAppSelector(getUserInfo);
 
     const dispatch = useAppDispatch();
@@ -117,16 +39,10 @@ const[dbuser,setDbuser]=useState(false);
          const{validate}=res;
         if(validate)
         {
-            setShowUploadButton(true)
-           const activeuser= await existingUser(data);
-            if(activeuser)
-            {
-                setIsLoading(true);
-                navigation.navigate('UserRegistration', { mobile, authdata:userData[0] });
-            }
+            //dispatch(userloginSuccess())
+            navigation.navigate('UserDashboardScreen',{data:data,otp})
         }
         else{
-            setShowUploadButton(false)
             Alert.alert("Invalid Otp");
         }
     }
@@ -140,12 +56,6 @@ const[dbuser,setDbuser]=useState(false);
         }
         setSubmitting(false);
     };
-    const handleUploadID = () => {
-      
-        navigation.navigate('UserUploadProfile', { mobile,isUserID:true,otp})
-    };
-
-  
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <SafeAreaView style={{
@@ -164,11 +74,8 @@ const[dbuser,setDbuser]=useState(false);
                         touched,
                         isSubmitting,
                     }) => (
-                        isLoading?(<>
-                       <Loader></Loader>
-                       </>):
                        ( <>
-                            {!isShowUploadButton ? (<View style={styles.inputContainer}>
+                         <View style={styles.inputContainer}>
                                 <Text style={styles.label}>ENTER YOUR 6 DIGIT OTP NUMBER</Text>
                                 <TextInput
                                     style={styles.input}
@@ -185,38 +92,8 @@ const[dbuser,setDbuser]=useState(false);
                                 }}>
                                     {touched.otpNumber && errors.otpNumber ? errors.otpNumber : null}
                                 </Text>
-                            </View>) : 
-                                 ( <View 
-                                  style={styles.inputContainer}
-                                >
-                            <Text style={styles.label}>Select Your Id</Text>
-                            <Dropdown
-                                style={styles.dropdown}
-                                placeholderStyle={styles.placeholderStyle}
-                                selectedTextStyle={styles.selectedTextStyle}
-                                iconStyle={styles.iconStyle}
-                                data={ID_OPTIONS}
-                                maxHeight={300}
-                                labelField="label"
-                                valueField="value"
-                                placeholder="Select an ID"
-                                value={dropid}
-                                onChange={(item) => {
-                                    setDropid(item.value);
-                                }}
-                                renderLeftIcon={() => (
-                                    <AntDesign
-                                        style={styles.icon}
-                                        color="black"
-                                        name="Safety"
-                                        size={20}
-                                    />
-                                )}
-                            />
-                            <Text style={styles.errorTxt}>{``}</Text>
-                        </View>)
-                            }
-                    {!isShowUploadButton  && <TouchableOpacity
+                            </View>
+                     <TouchableOpacity
                        
                         onPress={() =>
                             handleSubmit()
@@ -227,35 +104,19 @@ const[dbuser,setDbuser]=useState(false);
                         <Text style={styles.loginButtonText}>
                             {isSubmitting ? 'Submitting...' : 'Submit'}
                         </Text>
-                    </TouchableOpacity>}
+                    </TouchableOpacity>
 
-                    {isShowUploadButton ? (<TouchableOpacity
-                        onPress={() => {
-        
-                            handleUploadID();
-                        }}
-                        // onPress={() =>
-                        //     navigation.navigate('VisitorBookAppointmentScreen')
-                        //   }
-                        style={styles.resendOTPButton}
-                    >
-                        <Text style={styles.loginButtonText}>
-                            {isSubmitting ? 'UPloading...' : 'Upload Your Id Proof'}
-                        </Text>
-                    </TouchableOpacity>) : <TouchableOpacity
+                   <TouchableOpacity
                         onPress={() => {
                             showToast();
                             resendOtp(expecteddata.mobile, navigation)
                         }}
-                        // onPress={() =>
-                        //     navigation.navigate('VisitorBookAppointmentScreen')
-                        //   }
                         style={styles.resendOTPButton}
                     >
                         <Text style={styles.loginButtonText}>
                             {isSubmitting ? 'Submitting...' : 'Resend OTP'}
                         </Text>
-                    </TouchableOpacity>}
+                    </TouchableOpacity>
                 </>
                 )
                     

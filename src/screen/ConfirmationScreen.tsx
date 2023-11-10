@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform } from 'react-native';
-import { TextInput, Button, Headline } from 'react-native-paper';
+import { Headline } from 'react-native-paper';
 import Icons from '../constants/Icons';
-import VisitorLoginComponent from '../components/VisitorLoginComponent';
 import { useAppSelector } from '../stores/hooks';
 import { selectAuthenticated } from '../stores/authentication/selectors';
 import Confirmation from '../components/Confirmation';
 
 const ConfirmationScreen = ({ navigation ,route }: any) => {
+  const mobile=route.params.contact_number;
+  const data={mobile};
+ const phno={data}; 
+ const completed=true;
+  
+console.log('params.data.mobile',data.mobile);
   const authState = useAppSelector(selectAuthenticated);
-
+console.log('authstatein confirmatio',authState);
   useEffect(() => {
     const redirectTimeout = setTimeout(() => {
-      navigation.navigate('UserRegister'); // Navigate to the second screen
+      navigation.navigate('UserDashboardScreen',phno,completed); // Navigate to the second screen
     }, 5000); // 5000 milliseconds = 5 seconds
 
     return () => clearTimeout(redirectTimeout); // Clear the timeout if the component unmounts

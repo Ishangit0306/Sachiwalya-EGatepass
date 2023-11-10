@@ -8,7 +8,8 @@ import DashboardRoutes from './DashboardRoutes';
 const AppNavigation = () => {
     const data = useAppSelector(selectAuthenticated);
     const { isLoggedIn, role } = useAppSelector(selectAuthenticated);
-    //console.log('authentication state are*************',data)
+    console.log("islogin",isLoggedIn)
+    console.log('authentication state are*************',data)
     return (
         <NavigationContainer>
             {!isLoggedIn ? <AuthNavigation /> : <DashboardRoutes role={role} />}

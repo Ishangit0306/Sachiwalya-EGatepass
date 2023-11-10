@@ -9,6 +9,7 @@ export type TYPE_SECURITY = 'gatepass';
 export type TYPE_EMPLOYER = 'section';
 export type TYPE_ADMIN = 'admin';
 export type TYPE_PASSOFFICE = 'passoffice';
+export type TYPE_USER='user';
 
 
 

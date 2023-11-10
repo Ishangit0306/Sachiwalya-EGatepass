@@ -39,7 +39,13 @@ const UserCapturePhotoScreen = ({ navigation, route }: any) => {
       console.log('image data',formData);
        if(params.isUserID)
        {
-        navigation.navigate('EnterOTPScreen',{data:params.otp,formData});
+        let data=params.otp
+        if(data===undefined)
+        {
+          data={mobile:params.mobile}
+        }
+        console.log('datagoing',data);
+        navigation.navigate('UserDashboardScreen',{data,formData});
        }
        else
        {

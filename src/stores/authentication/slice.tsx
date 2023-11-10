@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuthState, User } from '../../types';
+import { ROLE_TYPE_USER } from '../../utils/config';
 
 export type LoginPayloadType = {
   user: User;
@@ -37,17 +38,22 @@ export const slice = createSlice({
     },
     smsStatus: (state, action: PayloadAction<{ status: boolean, number: number }>) => {
       state.sendSmsStatus = action.payload.status;
-      state.smsSendToNumber = action.payload. number
+      state.smsSendToNumber = action.payload.number
     },
     logoutSuccess: () => {
       return initialState;
     },
+    userloginSuccess: (state) => {
+      state.isLoggedIn = true,
+        state.role = ROLE_TYPE_USER
+    }
   },
 });
 
 export const {
   loginSuccess,
   logoutSuccess,
+  userloginSuccess,
   smsStatus
 } = slice.actions;
 

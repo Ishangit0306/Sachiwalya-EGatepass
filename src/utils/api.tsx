@@ -645,12 +645,6 @@ export const verifyOtpApi = async (data: any) => {
 
 export const fetchUser = async (data: any) => {
 
-  const requestBody = {
-    otp: data.enteredOTP,
-    id: data.id,
-    mobile: data.mobile
-  }
-  console.log('data for fetch user', requestBody);
   // name:uname,
   // address:uaddress,
   // gender:ugender,
@@ -666,18 +660,27 @@ export const fetchUser = async (data: any) => {
   //     visitorId:'222930071043',
   // pic:'abcd.jpeg'}
   try {
-    const response = await fetch(`${API_BASE_URL}/v1.0/verification/otp-validate`, {
-      method: 'PATCH',
+    // const response = await fetch(`${API_BASE_URL}/v1.0/verification/otp-validate`, {
+    //   method: 'PATCH',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //     //Authorization: `Bearer ${token}`,
+    //   },
+    //   body: JSON.stringify(requestBody),
+    // });
+
+     const response = await fetch(`${API_BASE_URL}/v1.0/visitor/get-visitor-info/${data.mobile}`, {
+      method: 'GET',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
         //Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(requestBody),
     });
     const resdata = await response.json();
     const resData = resdata.data;
-    console.log('resData', resData);
+    console.log('resData', resdata);
     console.log('reduxstoreapidata', resData);
 
     if (response.ok) {
@@ -992,3 +995,46 @@ console.log(JSON.stringify(requestBody));
   }
 
 }
+
+export const getParticularVisitorsListApi = async ({ token,archive,mobile}:any) => {
+  let API_URL_VISITOR;
+
+  console.log("mobileinapi",mobile)
+  // if (role === ROLE_TYPE_SECURITY || role === ROLE_TYPE_PASSOFFICE ) {
+  //   API_URL_VISITOR = `${API_BASE_URL}/oldvisitor/getTodayRecord`;
+
+  // } else if (role === ROLE_TYPE_EMPLOYEE) {
+  //   API_URL_VISITOR = `${API_BASE_URL}/v1.0/user/get-visitor-list/${eid}/${etype}/no/no/no/no/${archive}`
+  //   //API_URL_VISITOR = `${API_BASE_URL}/oldvisitor/getTodayRecord`
+  // }
+  API_URL_VISITOR = `${API_BASE_URL}/v1.0/user/get-visitor-list/0/0/no/no/no/${mobile}/${archive}`
+  // console.log(
+  //   'current url will be hit for visitor>>>>>>>>>>>>>>>>>>>>>>',
+  //   API_URL_VISITOR
+  // );
+
+  const response = await fetch(`${API_URL_VISITOR}`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  });
+
+  const data = await response.json();
+  if (response.ok) {
+    return {
+      data: data?.data?.list,
+      message: 'success',
+      statusCode: 200,
+      error: false,
+    };
+  } else {
+    return {
+      data: null,
+      message: data.message,
+      statusCode: 404,
+      error: true,
+    };
+  }
+};

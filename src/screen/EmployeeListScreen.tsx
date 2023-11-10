@@ -17,7 +17,7 @@ import { selectAuthenticated } from "../stores/authentication/selectors";
 import { getVisitorsList } from "../stores/visitors/selectors";
 import { VisitorsFormState } from "../types";
 import { useFocusEffect } from "@react-navigation/native";
-import { getVisitorsListApi, updateVisitorStatusApi } from "../utils/api";
+import { getParticularVisitorsListApi, getVisitorsListApi, updateVisitorStatusApi } from "../utils/api";
 import Toast from "react-native-root-toast";
 import { IconButton } from "react-native-paper";
 import { sendSMSToVisitor } from "../utils/sms";
@@ -77,14 +77,14 @@ const Item = ({
     onPress={onPress}
     style={[styles.item, { backgroundColor }]}
   >
-    <View style={[styles.textWrap]}>
+  { role && <View style={[styles.textWrap]}>
       <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
         Visitor Name:
       </Text>
       <Text style={styles.textRight}>{item?.name}</Text>
-    </View>
+    </View>}
 
-    {role === ROLE_TYPE_SECURITY && (
+    {role === ROLE_TYPE_SECURITY||"null" && (
       <>
         <View style={[styles.textWrap]}>
           <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
@@ -131,9 +131,12 @@ const Item = ({
     </View>
   </TouchableOpacity>
 );
-const EmployeeListScreen = ({ navigation }: any) => {
+const EmployeeListScreen = ({ navigation ,route}: any) => {
+  const{params}=route;
+  console.log('employee list ',params);
   const [selectedId, setSelectedId] = useState<string>();
   const authState: any = useAppSelector(selectAuthenticated);
+  console.log('authstate',authState);
   const [visitorData, setVisitorData] = useState<any>([]);
   const [pendingStatus, setPendingStatus] = useState("In Progress");
   const [isModalVisible, setModalVisible] = useState(false);
@@ -189,16 +192,29 @@ const EmployeeListScreen = ({ navigation }: any) => {
   useFocusEffect(
     React.useCallback(() => {
       console.log("active",activeTab);
-      const { token, role, user: { etype, eid } }: any = authState;
+     
+    
       const fetchLeaderBoardData = async () => {
         try {
-          const resData = await getVisitorsListApi({
-            token: token,
-            role: role,
-            etype: etype,
-            eid: eid,
-            archive:activeTab
-          });
+          let resData:any
+          if (params)
+          {
+            resData = await getParticularVisitorsListApi({
+              archive:activeTab,mobile:params.mobile
+            });
+          }
+          else
+          {
+            let { token, role, user: { etype, eid } }: any = authState;
+            resData = await getVisitorsListApi({
+              token: token,
+              role: role,
+              etype: etype,
+              eid: eid,
+              archive:activeTab
+            });
+          }
+         
 
           if (resData.statusCode === 200 || resData.statusCode === 201) {
             const data = resData.data;

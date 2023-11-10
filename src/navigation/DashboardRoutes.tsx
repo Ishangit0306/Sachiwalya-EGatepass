@@ -17,8 +17,12 @@ import VisitorPhotoScreen from "../screen/VisitorPhotoScreen";
 import QRdisplayScreen from "../screen/QRdisplayScreen";
 import { Button, IconButton } from "react-native-paper";
 import DocumentScannedScreen from "../screen/DocumentScannedScreen";
-import { ROLE_TYPE_PASSOFFICE, ROLE_TYPE_SECURITY } from "../utils/config";
+import { ROLE_TYPE_PASSOFFICE, ROLE_TYPE_SECURITY, ROLE_TYPE_USER } from "../utils/config";
 import PassOfficeDashboardScreen from "../screen/PassOfficeDashboardScreen";
+import UserVisitorBookAppointmentScreen from "../screen/UserVisitorBookAppointmentScreen";
+import UserCapturePhotoScreen from "../screen/UserCapturePhotoScreen";
+import ConfirmationScreen from "../screen/ConfirmationScreen";
+import UserDashboardScreen from "../screen/UserDashboardScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -63,9 +67,9 @@ const DashboardRoutes = ({ role }: any) => {
                         })}
                     />
                 </>
-            ) :role===ROLE_TYPE_PASSOFFICE?( 
+            ) : role === ROLE_TYPE_PASSOFFICE ? (
                 <>
-                  <Stack.Screen
+                    <Stack.Screen
                         name="PassOfficeDashboard"
                         component={PassOfficeDashboardScreen}
                         options={() => ({
@@ -74,8 +78,8 @@ const DashboardRoutes = ({ role }: any) => {
                             headerTitleAlign: "center",
                         })}
                     />
-                    </>
-            ): (
+                </>
+            ) : (
                 <>
                     <Stack.Screen
                         name="EmployeeDashboard"

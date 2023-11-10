@@ -6,6 +6,8 @@ import {
   TYPE_EMPLOYER,
   TYPE_PASSOFFICE,
   TYPE_SECURITY,
+  TYPE_USER,
+
 } from "../types";
 
 export const API_BASE_URL = "https://iammaven.com";
@@ -20,6 +22,7 @@ export const ROLE_TYPE_EMPLOYEE: TYPE_EMPLOYER = "section";
 export const ROLE_TYPE_SECURITY: TYPE_SECURITY = "gatepass";
 export const ROLE_TYPE_ADMIN: TYPE_ADMIN = "admin";
 export const ROLE_TYPE_PASSOFFICE: TYPE_PASSOFFICE = "passoffice";
+export const ROLE_TYPE_USER:TYPE_USER="user";
 
 const data = {
   section: USER_TYPE_EMPLOYEE,
