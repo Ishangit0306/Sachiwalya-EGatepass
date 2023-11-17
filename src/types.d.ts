@@ -68,6 +68,7 @@ export interface AuthState {
   isLoggedIn: boolean;
   sendSmsStatus?: boolean,
   smsSendToNumber?: number | null,
+  number?:number|null
 }
 
 export type UserFormData={

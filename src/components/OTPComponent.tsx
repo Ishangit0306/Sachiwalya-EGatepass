@@ -39,7 +39,8 @@ const OTPComponent = ({ navigation, otp ,formdata}: any) => {
          const{validate}=res;
         if(validate)
         {
-            //dispatch(userloginSuccess())
+            console.log('datainotp',data);
+            //dispatch(userloginSuccess({data:data.mobile}))
             navigation.navigate('UserDashboardScreen',{data:data,otp})
         }
         else{

@@ -79,7 +79,7 @@ const DashboardRoutes = ({ role }: any) => {
                         })}
                     />
                 </>
-            ) : (
+            )  : (
                 <>
                     <Stack.Screen
                         name="EmployeeDashboard"

@@ -14,7 +14,8 @@ const initialState: AuthState = {
   role: null,
   isLoggedIn: false,
   sendSmsStatus: false,
-  smsSendToNumber: null
+  smsSendToNumber: null,
+  number:null
 };
 
 export const slice = createSlice({
@@ -43,7 +44,8 @@ export const slice = createSlice({
     logoutSuccess: () => {
       return initialState;
     },
-    userloginSuccess: (state) => {
+    userloginSuccess: (state,action) => {
+      state.number=action.payload.data
       state.isLoggedIn = true,
         state.role = ROLE_TYPE_USER
     }

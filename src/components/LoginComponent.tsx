@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, TouchableWithoutFeedback, SafeAreaView, Keyboard } from 'react-native'
 import { TextInput } from 'react-native-paper';
 import { Formik, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 import { useAppDispatch } from '../stores/hooks';
 import { authLogin } from '../stores/authentication/userAuthenticate';
-
+import * as Notifications from 'expo-notifications';
+import { tokens } from 'react-native-paper/lib/typescript/styles/themes/v3/tokens';
+import Constants from 'expo-constants';
 interface LoginFormValues {
     email: string;
     password: string;
@@ -23,9 +25,17 @@ const loginValidationSchema = yup.object().shape({
         .required('Password is required')
         .min(6, 'Password must be at least 6 characters'),
 });
+let token:any
+ Notifications.getExpoPushTokenAsync({
+    projectId: Constants.expoConfig.extra.eas.projectId,
+  }).then((data)=>{ 
+    console.log("data",data);
+    token = data.data
+})
+
 
 const LoginComponent = ({ navigation }: any) => {
-
+console.log("tokennnnnn",token)
     const dispatch = useAppDispatch();
 
     const handleFormSubmit = (

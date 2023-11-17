@@ -11,7 +11,8 @@
       }
     },
     "android": {
-      "package": "com.ishanmalhotra.EGatepass"
+      "package": "com.evon.epass",
+      "googleServicesFile": "./google-services .json"
     },
     "plugins": [
       [
