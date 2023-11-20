@@ -10,16 +10,14 @@ import { useAppDispatch, useAppSelector } from "../stores/hooks";
 import { selectAuthenticated } from "../stores/authentication/selectors";
 import { departmentName, designationName, getEmployeeList, officerName, saveUserApi } from "../utils/api";
 import { formatDate, formatTime } from "../utils/custom";
-// import RNDateTimePicker from "@react-native-community/datetimepicker";
-
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { resetPhotoState } from "../stores/appointment/slice";
 import { getUserInfo } from "../stores/userdata/selectors";
-import CameraComponent from "../components/CameraComponent";
 import { API_BASE_URL, ROLE_TYPE_EMPLOYEE, ROLE_TYPE_SECURITY } from "../utils/config";
 import RadioGroup from 'react-native-radio-buttons-group';
-
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 const ID_OPTIONS = [
   { label: "Aadhar", value: 1 },
   { label: "Voter's ID", value: 2 },
@@ -224,6 +222,7 @@ console.log("route",route)
     officerName(dept, designation).then((res) => {
       // Assuming that the API response is stored in res.data
       const apiOfficer = res.data;
+      console.log("officernamebug",apiOfficer);
       setOdata(res.data);
 
 
@@ -234,7 +233,7 @@ console.log("route",route)
         if (designation ) {
           officerData.push(`${employee} (${designation})`);
         } else {
-          officerData.push(designation);
+          officerData.push(employee);
         }
       });
 
@@ -285,6 +284,22 @@ console.log("route",route)
     address: Yup.string()
   });
 
+
+  let deviceToken:any
+//  Notifications.getExpoPushTokenAsync({
+//     projectId: Constants.expoConfig.extra.eas.projectId,
+//   }).then((data)=>{ 
+//     deviceToken = data.data
+// })
+if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.extra.eas) {
+  Notifications.getExpoPushTokenAsync({
+    projectId: Constants.expoConfig.extra.eas.projectId,
+  }).then((data) => {
+    deviceToken = data.data;
+  });
+} else {
+  console.error("Some properties in Constants.expoConfig are undefined");
+}
   const handleFormSubmit = async (
     values: SecurityBookAppointmentValues,
     { setSubmitting }: FormikHelpers<SecurityBookAppointmentValues>,
@@ -307,7 +322,8 @@ console.log("route",route)
       contact_number: data.contactNumber ? data.contactNumber : params.mobile,
       visit_purpose: selectedPurpose,
       visitor_id: '',
-      upload_image_id: upload_image_id ?? ""
+      upload_image_id: upload_image_id ?? "",
+      dv_token:deviceToken
     };
     if (!data.uid) {
       formdata.img = params?.formData
@@ -346,6 +362,7 @@ console.log("route",route)
     formData.append("img", formdata.img);
     formData.append("visitor_id", formdata.visitor_id);
     formData.append("upload_image_id", formdata.upload_image_id);
+    formData.append("dv_token",formdata.dv_token)
     console.log('uid', data.uid);
 
     //  console.log('my form data>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#########################', formStoreData);

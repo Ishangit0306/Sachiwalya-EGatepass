@@ -10,6 +10,8 @@ import { Text, View, Button, Platform, Alert } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import { useNavigation } from '@react-navigation/native';
+
 
 
 Notifications.setNotificationHandler({
@@ -64,21 +66,16 @@ async function registerForPushNotificationsAsync() {
       Alert.alert('Failed to get push token for push notification!');
       return;
     }
-    token = await Notifications.getExpoPushTokenAsync({
-      projectId: Constants.expoConfig.extra.eas.projectId,
-    });
-    console.log('121',token);
+  
   } else {
     Alert.alert('Must use physical device for Push Notifications');
   }
   
-if(token)
-{
-return token.data;
-}
+
 }
 
 const App = () => {
+
 
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
@@ -95,6 +92,7 @@ const App = () => {
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
       console.log(response);
+      //navigation.navigate('EmployeeListScreen');
     });
 
     return () => {

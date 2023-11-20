@@ -27,9 +27,11 @@ import { TYPE_ADMIN, TYPE_EMPLOYER, TYPE_PASSOFFICE, TYPE_SECURITY } from '../ty
 
 export const fetchLoginApi = async (data: any) => {
   const requestData = data;
+  console.log("loginapidata",requestData);
   const requestBody = {
     username: requestData.email,
     password: requestData.password,
+    dv_token:requestData.deviceToken
   };
   try {
     console.log('base url', API_BASE_URL);

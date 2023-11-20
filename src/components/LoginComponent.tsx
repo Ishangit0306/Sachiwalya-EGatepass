@@ -25,17 +25,23 @@ const loginValidationSchema = yup.object().shape({
         .required('Password is required')
         .min(6, 'Password must be at least 6 characters'),
 });
-let token:any
- Notifications.getExpoPushTokenAsync({
+// let deviceToken:any
+//  Notifications.getExpoPushTokenAsync({
+//     projectId: Constants.expoConfig.extra.eas.projectId,
+//   }).then((data)=>{ 
+//     deviceToken = data.data
+// })
+let deviceToken:any
+if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.extra.eas) {
+  Notifications.getExpoPushTokenAsync({
     projectId: Constants.expoConfig.extra.eas.projectId,
-  }).then((data)=>{ 
-    console.log("data",data);
-    token = data.data
-})
-
-
+  }).then((data) => {
+    deviceToken = data.data;
+  });
+} else {
+  console.error("Some properties in Constants.expoConfig are undefined");
+}
 const LoginComponent = ({ navigation }: any) => {
-console.log("tokennnnnn",token)
     const dispatch = useAppDispatch();
 
     const handleFormSubmit = (
@@ -43,7 +49,8 @@ console.log("tokennnnnn",token)
         { setSubmitting }: FormikHelpers<LoginFormValues>,
     ) => {
         if (values) {
-            dispatch(authLogin({ data: values, navigation }));
+            const requestData={...values,deviceToken}
+            dispatch(authLogin({ data: requestData, navigation }));
         }
         setSubmitting(false);
     };
