@@ -49,6 +49,7 @@ export const slice = createSlice({
       state.isLoggedIn = true,
         state.role = ROLE_TYPE_USER
     }
+    
   },
 });
 

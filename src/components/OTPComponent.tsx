@@ -40,8 +40,10 @@ const OTPComponent = ({ navigation, otp ,formdata}: any) => {
         if(validate)
         {
             console.log('datainotp',data);
-            //dispatch(userloginSuccess({data:data.mobile}))
+            dispatch(userloginSuccess({data:data.mobile}))
             navigation.navigate('UserDashboardScreen',{data:data,otp})
+           
+           
         }
         else{
             Alert.alert("Invalid Otp");

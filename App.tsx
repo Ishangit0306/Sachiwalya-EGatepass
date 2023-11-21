@@ -6,7 +6,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
 import { RootSiblingParent } from 'react-native-root-siblings';
 import { useState, useEffect, useRef } from 'react';
-import { Text, View, Button, Platform, Alert } from 'react-native';
+import { Text, View, Button, Platform, Alert, ToastAndroid } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
@@ -88,6 +88,14 @@ const App = () => {
 
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       setNotification(notification);
+
+      ToastAndroid.showWithGravityAndOffset(
+        notification.request.content.title,
+        ToastAndroid.LONG,
+        ToastAndroid.TOP,
+        25,
+        50
+      );
     });
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {

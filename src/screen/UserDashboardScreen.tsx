@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View, Image, Linking, Alert } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, Image, Linking, Alert, BackHandler } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import LogoutButton from '../components/LogoutButton'
 import Icons from '../constants/Icons'
@@ -12,10 +12,11 @@ import { getUserInfo } from '../stores/userdata/selectors';
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Loader from './../components/Loader';
+import { selectAuthenticated } from '../stores/authentication/selectors'
 
 const UserDashboardScreen = ({ navigation, route }: any) => {
-
-console.log("routeindashboard",route);
+    const dispatch = useAppDispatch();
+//console.log("routeindashboard",route);
     const ID_OPTIONS = [
         { label: "Aadhar", value: 1 },
         { label: "Voter's ID", value: 2 },
@@ -23,21 +24,52 @@ console.log("routeindashboard",route);
         { label: "None", value: 4 }
 
     ];
-
+    const mobile= useAppSelector(selectAuthenticated).number
     const [dropid, setDropid] = useState<any>(1);
-    const { params } = route;
-    console.log('paramsinuserscreen', route);
+    let { params } = route;
+    if(params===undefined && mobile)
+    {
+        const data={mobile}
+        params={data}
+    }
+     console.log("paramsfromselector",params);
+    // console.log('paramsinuserscreen', route);
     const [isShowUploadButton, setShowUploadButton] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     let userData: any = []
-    const dispatch = useAppDispatch();
+   
     useEffect(()=>{
+        if(params===undefined && mobile)
+    {
+        const data={mobile}
+        params={data}
+    }
+
 if(route.key )
 {
     setIsLoading(false)
     setShowUploadButton(false)
 }
-    },[route])
+    },[route,mobile])
+
+
+    useEffect(() => {
+        const handleBackButton = () => {
+          // Add your logic here
+          setIsLoading(false);
+          setShowUploadButton(false);
+    
+          // Return false to allow the default back button behavior
+          return true;
+        };
+    
+        // Add the event listener
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+    
+        // Clean up the event listener when the component unmounts
+        return () => backHandler.remove();
+      }, []);
+
 
     useEffect(() => {
 
@@ -51,7 +83,7 @@ if(route.key )
 
 
     useEffect(() => {
-        if (params?.formData) {
+        if (params&&params?.formData) {
             console.log("paramscheck",params.data.mobile)
             let form = new FormData();
             form.append("typeOfId", dropid);
@@ -64,7 +96,7 @@ if(route.key )
         }
 
 
-    }, [params.formData])
+    }, [params?.formData])
 
 
 
@@ -162,13 +194,20 @@ if(route.key )
         <TouchableOpacity style={styles.button} onPress={() =>showQR( params.data.mobile)}>
           <Text style={styles.buttonText}>Get your QR</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
             onPress={() => navigation.navigate('UserRegister')}
             style={styles.button}>
             <Text style={styles.buttonText}>Logout</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <LogoutButton />
             </View>):
-            ( <View 
+            (
+                <View  style={{
+                    width: '90%',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center'
+                }}>
+                <View 
                 style={styles.inputContainer}
               >
           <Text style={styles.label}>Select Your Id</Text>
@@ -206,6 +245,7 @@ if(route.key )
          Upload Your Id Proof
       </Text>
   </TouchableOpacity> 
+      </View>
       </View>
       )}
         </View>)

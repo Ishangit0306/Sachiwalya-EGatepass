@@ -526,7 +526,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                     }}>
                     <View
                       style={{
-                        width: '48%',
+                        width: '50%',
                       }}>
                       <Text style={styles.label}>Appointment Date</Text>
 
@@ -536,9 +536,10 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                         date={date}
                         onConfirm={handleDateConfirm}
                         onCancel={hideDatePickerModal}
-                        minimumDate={
-                          new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
-                        }
+                        // minimumDate={
+                        //   new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+                        // }
+                        minimumDate={new Date()}
                       />
 
                       <TouchableOpacity
@@ -562,7 +563,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
 
                     <View
                       style={{
-                        width: '48%',
+                        width: '50%',
                       }}>
                       <Text style={styles.label}>Appointment Time</Text>
                       {showPicker && (

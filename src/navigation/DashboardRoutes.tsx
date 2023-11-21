@@ -79,7 +79,42 @@ const DashboardRoutes = ({ role }: any) => {
                         })}
                     />
                 </>
-            )  : (
+            ) : role === ROLE_TYPE_USER ? (<>
+                <Stack.Screen
+                    name="UserDashboardScreen"
+                    component={UserDashboardScreen}
+                    options={() => ({
+                        headerShown: true,
+                        headerTitle: "UserDashboardScreen",
+                        headerTitleAlign: "center",
+                    })}
+                />
+                <Stack.Screen
+                    name="UserRegistration"
+                    component={UserVisitorBookAppointmentScreen}
+                    options={() => ({
+                        headerShown: false,
+                    })}
+                />
+                {/* <Stack.Screen
+                    name="EmployeeListScreen"
+                    component={EmployeeListScreen}
+                    options={() => ({
+                        headerShown: true,
+                        headerTitle: "Check Pending Status",
+                        headerTitleAlign: "center",
+                    })}
+                /> */}
+                <Stack.Screen name="UserUploadProfile"
+                    component={UserCapturePhotoScreen}
+                    options={{ title: 'capture screen ' }}
+                />
+                <Stack.Screen name="ConfirmationScreen"
+                    component={ConfirmationScreen}
+                    options={{ title: 'Confirmation ' }}
+                />
+
+            </>) : (
                 <>
                     <Stack.Screen
                         name="EmployeeDashboard"

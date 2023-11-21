@@ -8,14 +8,17 @@ import ConfirmationScreen from '../screen/ConfirmationScreen';
 import UserCapturePhotoScreen from '../screen/UserCapturePhotoScreen';
 import UserDashboardScreen from '../screen/UserDashboardScreen';
 import EmployeeListScreen from '../screen/EmployeeListScreen';
-
+import { ROLE_TYPE_USER } from '../utils/config';
+import { useAppSelector } from '../stores/hooks';
+import { selectAuthenticated } from '../stores/authentication/selectors';
 export const Stack = createNativeStackNavigator();
 
 const AuthNavigation = () => {
+  const {  role } = useAppSelector(selectAuthenticated);
   return (
 
     <Stack.Navigator>
-
+ <>
       <Stack.Screen
         name="UserRegister"
         component={MemberScreen}
@@ -38,41 +41,7 @@ const AuthNavigation = () => {
           headerShown: false,
         })}
       />
-      <Stack.Screen
-        name="UserRegistration"
-        component={UserVisitorBookAppointmentScreen}
-        options={() => ({
-          headerShown: false,
-        })}
-      />
-
-      <Stack.Screen name="UserUploadProfile"
-        component={UserCapturePhotoScreen}
-        options={{ title: 'capture screen ' }}
-      />
-      <Stack.Screen name="ConfirmationScreen"
-        component={ConfirmationScreen}
-        options={{ title: 'Confirmation ' }}
-      />
-
-      <Stack.Screen
-        name="UserDashboardScreen"
-        component={UserDashboardScreen}
-        options={() => ({
-          headerShown: true,
-          headerTitle: "UserDashboardScreen",
-          headerTitleAlign: "center",
-        })}
-      />
- <Stack.Screen
-                name="EmployeeListScreen"
-                component={EmployeeListScreen}
-                options={() => ({
-                    headerShown: true,
-                    headerTitle: "Check Pending Status",
-                    headerTitleAlign: "center",
-                })}
-            />
+      </>
     </Stack.Navigator>
   );
 };

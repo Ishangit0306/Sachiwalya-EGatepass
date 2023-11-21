@@ -656,11 +656,12 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
                           date={date}
                           onConfirm={handleDateConfirm}
                           onCancel={hideDatePickerModal}
-                          minimumDate={new Date(new Date().getTime() + 24 * 60 * 60 * 1000)}
+                          minimumDate={new Date()}
+                          //minimumDate={new Date(new Date().getTime() + 24 * 60 * 60 * 1000)}
                         />
 
 
-                        <TouchableOpacity onPress={showDatePickerModal} disabled={role === ROLE_TYPE_SECURITY}>
+                        <TouchableOpacity onPress={showDatePickerModal} >
                           <TextInput
                             style={styles.input}
                             value={date.toDateString()}
@@ -692,7 +693,7 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
                             is24Hour={true}
                           />
                         )}
-                        <TouchableOpacity onPress={showTimePicker} disabled={role === "security"}>
+                        <TouchableOpacity onPress={showTimePicker} >
                           <TextInput
                             style={styles.input}
                             value={time.toLocaleTimeString()}
@@ -804,13 +805,13 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
                     </Text> */}
                   </View>}
 
-                  {!data.pic && (!clicked || !imageUri) && <TouchableOpacity
+                  {!data.pic && (!clicked || !imageUri) &&!uploadAgain && <TouchableOpacity
                     style={styles.buttonupload}
                     onPress={() => { navigation.navigate('UserUploadProfile', { mobile: params.mobile, authdata: params.authdata }), setClicked(!clicked) }}
                   >
                     <Text style={styles.buttonText}>Upload Your Photo</Text>
                   </TouchableOpacity>}
-                  {(clicked || data.pic) && (imageUri || data.pic) ? (
+                  {(clicked || data.pic) && (imageUri || data.pic) ||uploadAgain ? (
                     <View style={styles.inputContainer}>
                       <View><Text style={styles.label}>Visitors Photo</Text></View>
                       <View style={styles.field}>

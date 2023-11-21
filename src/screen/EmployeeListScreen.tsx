@@ -22,7 +22,7 @@ import Toast from "react-native-root-toast";
 import { IconButton } from "react-native-paper";
 import { sendSMSToVisitor } from "../utils/sms";
 import moment from 'moment-timezone';
-import { API_BASE_URL, ROLE_TYPE_EMPLOYEE, ROLE_TYPE_SECURITY } from "../utils/config";
+import { API_BASE_URL, ROLE_TYPE_EMPLOYEE, ROLE_TYPE_SECURITY, ROLE_TYPE_USER } from "../utils/config";
 
 type ItemData = {
   PurposeOfVisit: string;
@@ -77,7 +77,7 @@ const Item = ({
     onPress={onPress}
     style={[styles.item, { backgroundColor }]}
   >
-  { role && <View style={[styles.textWrap]}>
+  { role!==ROLE_TYPE_USER && <View style={[styles.textWrap]}>
       <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
         Visitor Name:
       </Text>
