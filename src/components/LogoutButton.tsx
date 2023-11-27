@@ -1,12 +1,25 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import { useAppDispatch } from '../stores/hooks'
+import { useAppDispatch, useAppSelector } from '../stores/hooks'
 import { logoutSuccess } from '../stores/authentication/slice'
+import { selectAuthenticated } from '../stores/authentication/selectors'
+import { logoutapi } from '../utils/api'
 
 const LogoutButton = () => {
+ let reqdata:any
+const data = useAppSelector(selectAuthenticated);
+ const { token, user } = data;
+const eid = user?.eid;
+const userName = user?.userName;
+  reqdata = { token, eid, userName };
     const dispatch = useAppDispatch()
-
-    const handleLogout = () => {
+    const handleLogout = async() => {
+        if(token)
+        {
+            console.log("token",reqdata);
+            await logoutapi(reqdata)
+        }
+        
         dispatch(logoutSuccess());
     }
 

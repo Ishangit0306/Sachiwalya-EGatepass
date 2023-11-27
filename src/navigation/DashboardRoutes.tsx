@@ -171,7 +171,7 @@ const DashboardRoutes = ({ role }: any) => {
                 component={EmployeeListScreen}
                 options={() => ({
                     headerShown: true,
-                    headerTitle: "Check Pending Status",
+                    headerTitle: "Check Status",
                     headerTitleAlign: "center",
                 })}
             />

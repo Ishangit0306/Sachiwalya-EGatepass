@@ -22,7 +22,9 @@ import Toast from "react-native-root-toast";
 import { IconButton } from "react-native-paper";
 import { sendSMSToVisitor } from "../utils/sms";
 import moment from 'moment-timezone';
-import { API_BASE_URL, ROLE_TYPE_EMPLOYEE, ROLE_TYPE_SECURITY, ROLE_TYPE_USER } from "../utils/config";
+import { API_BASE_URL, ROLE_TYPE_EMPLOYEE, ROLE_TYPE_PASSOFFICE, ROLE_TYPE_SECURITY, ROLE_TYPE_USER } from "../utils/config";
+import * as Print from 'expo-print';
+
 
 type ItemData = {
   PurposeOfVisit: string;
@@ -37,6 +39,7 @@ type ItemProps = {
   onPress: () => void;
   backgroundColor: string;
   textColor: string;
+  print:()=> void;
 };
 
 const statusText = (isapproved: number) => {
@@ -71,7 +74,9 @@ const Item = ({
   backgroundColor,
   textColor,
   role,
+  print
 }: ItemProps) => (
+  
   <TouchableOpacity
     key={item?.visitorId}
     onPress={onPress}
@@ -129,6 +134,14 @@ const Item = ({
         {statusText(item?.isapproved)}
       </Text>
     </View>
+   {role===ROLE_TYPE_PASSOFFICE && <View style={styles.container}>
+      <Button title="Print" onPress={print} disabled={item?.isapproved===0} />
+ 
+      <View style={styles.spacer} />
+      {/* {item?.isapproved === 0 && (
+  <Text style={{ color: 'red' }}>This button is disabled until the item is approved or rejected.</Text>
+)} */}
+    </View>}
   </TouchableOpacity>
 );
 const EmployeeListScreen = ({ navigation ,route}: any) => {
@@ -140,7 +153,7 @@ const EmployeeListScreen = ({ navigation ,route}: any) => {
   const [visitorData, setVisitorData] = useState<any>([]);
   const [pendingStatus, setPendingStatus] = useState("In Progress");
   const [isModalVisible, setModalVisible] = useState(false);
-
+  const [selectedPrinter, setSelectedPrinter] = React.useState();
   const [selectedVisitorId, setSelectorVisitorId] = useState<number>();
   // const [meetingDate, setMeetingDate] = useState<any>("");
   // const [meetingTime, setMeetingTime] = useState<any>("");
@@ -148,7 +161,6 @@ const EmployeeListScreen = ({ navigation ,route}: any) => {
   // const [meetEmployee, setMeetEmployee] = useState<string>("Evon Tech");
   // const [meetVisitor, setMeetVisitor] = useState<string>("");
   const [itemObj, setItemObj] = useState<any>({});
-
 
   const handleButtonPress = (visitorId: number, isapproved: number, item: any) => {
 
@@ -166,10 +178,83 @@ const EmployeeListScreen = ({ navigation ,route}: any) => {
 
   //modal end
   const renderItem = ({ item }: { item: any }) => {
-    console.log('item', item);
     const backgroundColor = item?.id === selectedId ? "#cce5ff" : "#f2f2f2";
     const color = item?.id === selectedId ? "blue" : "black";
     const formattedDate = moment(item.date).format('YYYY-MM-DD');
+    const html = `
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+        <style>
+          
+  
+          p {
+            font-size: 20px;
+          }
+  
+          .heading {
+            font-size: 50px;
+            font-weight: bold;
+            font-family: 'Helvetica Neue';
+            margin-bottom: 10px;
+          }
+  
+          .normal-text {
+            font-size: 30px;
+            font-family: 'Helvetica Neue';
+            font-weight: normal;
+          }
+  
+          .status {
+            font-size: 30px;
+            font-family: 'Helvetica Neue';
+            font-weight: normal;
+            color: ${getStatusColor(item?.isapproved)};
+          }
+          .abc{
+            display:flex;
+            justify-content:space-evenly;
+            align-items:center;
+          
+          }
+          .xyz{
+            align-self:flex-start;
+          }
+        </style>
+      </head>
+      <body>
+      <p class="heading"><i>Sachivalaya E-Gatepass<i></p>
+      <div class="abc">
+     
+        <div class="xyz" >
+        <p>
+        <p class="normal-text"><b>Name</b>: ${item?.name}</p>
+        <p class="normal-text"><b>To Meet</b>: ${item?.ename}</p>
+        <p class="normal-text"><b>Department</b>: ${item?.edepartment}</p>
+        <p class="normal-text"><b>Date</b>: ${formattedDate}</p>
+        <p class="normal-text"><b>Time</b>:${item?.time}</p>
+        <p class="normal-text"><b>Status</b>:<span class="status"> ${statusText(item?.isapproved)}<span></p>
+        </div>
+        <div>
+        <img
+          src="https://iammaven.com/v1.0/visitor/image/${item.profile_pic}"
+          style="width: 30vw;"
+        />
+        </div>
+        </div>
+      </body>
+    </html>
+  `;
+  
+    const print = async () => {
+      // On iOS/android prints the given html. On web prints the HTML from the current page.
+      await Print.printAsync({
+        html,
+        //printerUrl: selectedPrinter?.url, // iOS only
+      });
+    };
+    console.log('item', item);
+  
     return (
       <>
         <Item
@@ -178,6 +263,7 @@ const EmployeeListScreen = ({ navigation ,route}: any) => {
           backgroundColor={backgroundColor}
           textColor={color}
           role={authState.role}
+          print={print}
         />
       </>
     );
@@ -532,6 +618,12 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: 'blue', // Color for active tab text
+  },
+  spacer: {
+    height: 8,
+  },
+  printer: {
+    textAlign: 'center',
   },
 });
 

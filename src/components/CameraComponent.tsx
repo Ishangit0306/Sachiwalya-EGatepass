@@ -72,7 +72,7 @@ const CameraComponent = ({ sendPhotoToNextScreen }: any) => {
       setIsButton(true)
       setTimeout(() => {
         setIsButton(false);
-      }, 5000);
+      }, 15000);
 
       sendPhotoToNextScreen({
         photo: photo

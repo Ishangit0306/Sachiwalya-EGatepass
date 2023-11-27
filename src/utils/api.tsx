@@ -411,7 +411,7 @@ export const scannedDocumentApi = async (data: FormData, token: string) => {
       };
     }
   } catch (error) {
-    console.error('Error in bookAppointmentFormApi:', error);
+    console.error('Error in scannedDocumentApi:', error);
     return {
       data: null,
       statusCode: null,
@@ -1032,6 +1032,39 @@ export const getParticularVisitorsListApi = async ({ token,archive,mobile}:any) 
       error: false,
     };
   } else {
+    return {
+      data: null,
+      message: data.message,
+      statusCode: 404,
+      error: true,
+    };
+  }
+};
+
+export const logoutapi = async (data:any) => {
+  const requestBody={
+    token: data.token,
+    username:data.userName,
+    empid:data.eid
+  }
+  console.log("reqbody.....",requestBody)
+  const response = await fetch(`${API_BASE_URL}/api/logout`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestBody)
+  });
+  if (response.ok) {
+    console.log("logout api working ")
+    return {
+      message: 'success',
+      statusCode: 200,
+      error: false,
+    };
+  } else {
+ console.log(" logout api crashed")
     return {
       data: null,
       message: data.message,
