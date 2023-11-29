@@ -1072,4 +1072,36 @@ export const logoutapi = async (data:any) => {
       error: true,
     };
   }
+
+  
+};
+
+export const printQR = async (data:any) => {
+  const response = await fetch(`${API_BASE_URL}/oldvisitor/getqrcode/${data}`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  });
+  if (response.ok) {
+
+    const res=await response.json();
+  const data=res.qr;
+    return {
+      qrdata:data,
+      message: 'success',
+      statusCode: 200,
+      error: false,
+    };
+  } else {
+    return {
+      qrdata: null,
+      message: data.message,
+      statusCode: 404,
+      error: true,
+    };
+  }
+
+  
 };

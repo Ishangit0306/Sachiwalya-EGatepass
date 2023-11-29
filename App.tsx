@@ -11,6 +11,7 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { useNavigation } from '@react-navigation/native';
+import SplashScreen from './src/screen/SplashScreen';
 
 
 
@@ -108,6 +109,24 @@ const App = () => {
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
+
+  const [isSplashVisible, setSplashVisible] = useState(true);
+
+  useEffect(() => {
+    // Simulate a delay for the splash screen (you can replace this with actual loading logic)
+    const splashTimer = setTimeout(() => {
+      setSplashVisible(false);
+    }, 2000); // Adjust the time as needed
+
+    // Clear the timer on component unmount (cleanup)
+    return () => clearTimeout(splashTimer);
+  }, []);
+
+  if (isSplashVisible) {
+    // Render the splash screen
+    return <SplashScreen />;
+  }
+
   return (
     <PersistGate loading={null} persistor={persistor}>
       <Provider store={store}>

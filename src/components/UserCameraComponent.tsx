@@ -10,6 +10,7 @@ import {
   import React, { useEffect, useState, useRef } from "react";
   import { Camera, CameraType } from "expo-camera";
   import Icon from "react-native-vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
   
   type CameraComponentType = {
     savePhotoToNextScreen: any
@@ -17,6 +18,7 @@ import {
   
   const UserCameraComponent = ({ sendPhotoToNextScreen,route }: any) => {
    
+    const navigation=useNavigation()
     const cameraRef = useRef<any>(null);
   
     const [type, setType] = useState(CameraType.back);
@@ -86,11 +88,13 @@ import {
   
     const runOpenCamera = async () => {
       setOpenCamera(!openCamera);
+    
     };
   
     function closeCamera() {
       
       setOpenCamera(false);
+      navigation.goBack()
     }
   
     if (photo) {

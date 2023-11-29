@@ -48,7 +48,7 @@ interface SecurityBookAppointmentValues {
   date: string,
   time: string,
   email_id: string,
-  doc_no: any,
+  doc_no: string,
   address: string,
   // documentType: DocumentType,
 }
@@ -280,7 +280,7 @@ console.log("route",route)
     //contact_number: Yup.string().required(' Visitor Contact number is required'),
     date: Yup.string().required('Date field is required'),
     time: Yup.string().required('Time field is required'),
-    doc_no: Yup.string(),
+    doc_no: Yup.string().required('ID number is required'),
     address: Yup.string()
   });
 
@@ -404,8 +404,16 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
         : await saveUserApi(formData);
     
       // Handle the successful API response here
-      const cameraScreenData = { ...formdata, "imgFor": "userprofile" };
-      navigation.navigate("ConfirmationScreen", cameraScreenData);
+      if(response.statusCode==200)
+      {
+
+        const cameraScreenData = { ...formdata, "imgFor": "userprofile" };
+        navigation.navigate("ConfirmationScreen", cameraScreenData);
+      }
+      else
+      {
+        Alert.alert("Something Went Wrong");
+      }
     } catch (error) {
       // Handle exceptions (errors) that occurred during the API call
       Alert.alert("API call failed");
@@ -804,10 +812,10 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
                         : null}
                     </Text> */}
                   </View>}
-
-                  {!data.pic && (!clicked || !imageUri) &&!uploadAgain && <TouchableOpacity
+                    
+                  {!data.pic && (!clicked || !imageUri) &&!uploadAgain  && <TouchableOpacity
                     style={styles.buttonupload}
-                    onPress={() => { navigation.navigate('UserUploadProfile', { mobile: params.mobile, authdata: params.authdata }), setClicked(!clicked) }}
+                    onPress={() => { navigation.navigate('UserUploadProfile', { mobile: params.mobile, authdata: params.authdata }), setClicked(true) }}
                   >
                     <Text style={styles.buttonText}>Upload Your Photo</Text>
                   </TouchableOpacity>}
@@ -818,12 +826,12 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
 
                         <Image
                           style={styles.image}
-                          source={data.pic && !uploadAgain ? { uri: `https://iammaven.com/v1.0/visitor/image/${data.pic}` } : { uri: imageUri }}
+                          source={data.pic && (!uploadAgain)||(uploadAgain &&!imageUri)? { uri: `https://iammaven.com/v1.0/visitor/image/${data.pic}` } : { uri: imageUri }}
                         />
 
                       </View>
-                      <View><TouchableOpacity onPress={() => { navigation.navigate('UserUploadProfile', { mobile: params.mobile, authdata: params.authdata }), setClicked(!clicked), setUploadAgain(!uploadAgain) }}>
-                        <Text style={styles.label}>Upload Photo Again?</Text>
+                      <View><TouchableOpacity  style={styles.uploadbutton} onPress={() => { navigation.navigate('UserUploadProfile', { mobile: params.mobile, authdata: params.authdata }), setClicked(true), setUploadAgain(true) }}>
+                        <Text style={styles.uploadbuttonText}>Change Photo</Text>
                       </TouchableOpacity></View>
                     </View>
                   ) : null}
@@ -851,10 +859,10 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
                       placeholder="Enter ID Number"
                     />
                     <Text style={styles.errorTxt}>
-                      {/* {touched.doc_no && errors.doc_no
-                        ? errors.idproof
-                        : null} */}
-                    </Text>
+                        {touched.doc_no && errors.doc_no
+                          ? errors.doc_no
+                          : null}
+                      </Text>
                   </View>
                   {/* <View
                     style={styles.inputContainer}
@@ -1068,5 +1076,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // or 'column' for vertical alignment
     justifyContent: 'space-between',
     width: 100, // adjust to your desired width
+  },
+  uploadbutton: {
+    backgroundColor: '#3498db', // Change the color according to your design
+    padding: 10,
+    borderRadius: 5,
+    margin: 10,
+  },
+  uploadbuttonText: {
+    color: '#ffffff', // Change the color according to your design
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });

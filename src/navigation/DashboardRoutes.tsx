@@ -26,7 +26,9 @@ import UserDashboardScreen from "../screen/UserDashboardScreen";
 
 const Stack = createNativeStackNavigator();
 
+
 const DashboardRoutes = ({ role }: any) => {
+    const name= useAppSelector(selectAuthenticated).user?.userName;
     return (
         <Stack.Navigator>
             {role === ROLE_TYPE_SECURITY ? (
@@ -36,7 +38,8 @@ const DashboardRoutes = ({ role }: any) => {
                         component={SecurityDashboardScreen}
                         options={() => ({
                             headerShown: true,
-                            headerTitle: "Security Dashboard",
+                            headerTitle: `Welcome ${name}`,
+                            headerTitleAlign: "center",
                         })}
                     />
 
@@ -74,7 +77,7 @@ const DashboardRoutes = ({ role }: any) => {
                         component={PassOfficeDashboardScreen}
                         options={() => ({
                             headerShown: true,
-                            headerTitle: "PassOffice Dashboard",
+                            headerTitle: `Welcome ${name}`,
                             headerTitleAlign: "center",
                         })}
                     />
@@ -84,7 +87,7 @@ const DashboardRoutes = ({ role }: any) => {
                     name="UserDashboardScreen"
                     component={UserDashboardScreen}
                     options={() => ({
-                        headerShown: true,
+                        headerShown: false,
                         headerTitle: "UserDashboardScreen",
                         headerTitleAlign: "center",
                     })}
@@ -121,7 +124,7 @@ const DashboardRoutes = ({ role }: any) => {
                         component={EmployeeDashboardScreen}
                         options={() => ({
                             headerShown: true,
-                            headerTitle: "Employee Dashboard",
+                            headerTitle: `Welcome ${name}`,
                             headerTitleAlign: "center",
                         })}
                     />

@@ -19,7 +19,7 @@ const UserCapturePhotoScreen = ({ navigation, route }: any) => {
       height: photo.height,
       width: photo.width,
     }
-
+console.log("phooooto...",photo);
     if (photo) {
        //let formData = new FormData();
       const ext = mydata.uri.substring(mydata.uri.lastIndexOf(".") + 1);

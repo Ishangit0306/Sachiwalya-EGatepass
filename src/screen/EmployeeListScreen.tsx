@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  BackHandler,
   Button,
   FlatList,
   Image,
@@ -16,8 +17,8 @@ import { useAppSelector } from "../stores/hooks";
 import { selectAuthenticated } from "../stores/authentication/selectors";
 import { getVisitorsList } from "../stores/visitors/selectors";
 import { VisitorsFormState } from "../types";
-import { useFocusEffect } from "@react-navigation/native";
-import { getParticularVisitorsListApi, getVisitorsListApi, updateVisitorStatusApi } from "../utils/api";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { getParticularVisitorsListApi, getVisitorsListApi, printQR, updateVisitorStatusApi } from "../utils/api";
 import Toast from "react-native-root-toast";
 import { IconButton } from "react-native-paper";
 import { sendSMSToVisitor } from "../utils/sms";
@@ -145,23 +146,31 @@ const Item = ({
   </TouchableOpacity>
 );
 const EmployeeListScreen = ({ navigation ,route}: any) => {
+  const [qrData,setqrData]=useState('')
+  const navig=useNavigation();
+  useEffect(() => {
+    const backAction = () => {
+      // Handle back button press
+      // You can customize this logic based on your requirements
+      navig.goBack();
+      return true; // Return true to prevent default behavior (exit the app)
+    };
+
+    // Add event listener for the hardware back button
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    // Cleanup the event listener when the component is unmounted
+    return () => backHandler.remove();
+  }, []);
   const{params}=route;
-  console.log('employee list ',params);
   const [selectedId, setSelectedId] = useState<string>();
   const authState: any = useAppSelector(selectAuthenticated);
-  console.log('authstate',authState);
   const [visitorData, setVisitorData] = useState<any>([]);
   const [pendingStatus, setPendingStatus] = useState("In Progress");
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPrinter, setSelectedPrinter] = React.useState();
   const [selectedVisitorId, setSelectorVisitorId] = useState<number>();
-  // const [meetingDate, setMeetingDate] = useState<any>("");
-  // const [meetingTime, setMeetingTime] = useState<any>("");
-  // const [meetDept, setMeetDept] = useState<any>("");
-  // const [meetEmployee, setMeetEmployee] = useState<string>("Evon Tech");
-  // const [meetVisitor, setMeetVisitor] = useState<string>("");
   const [itemObj, setItemObj] = useState<any>({});
-
   const handleButtonPress = (visitorId: number, isapproved: number, item: any) => {
 
     if (authState?.role == ROLE_TYPE_EMPLOYEE && isapproved === 0) {
@@ -171,82 +180,106 @@ const EmployeeListScreen = ({ navigation ,route}: any) => {
       setSelectorVisitorId(visitorId);
     }
   };
-  //console.log('itemobj',itemObj);
   const _drawerOpenClose = () => {
     setModalVisible(false);
-  };
+  }; 
 
   //modal end
   const renderItem = ({ item }: { item: any }) => {
     const backgroundColor = item?.id === selectedId ? "#cce5ff" : "#f2f2f2";
     const color = item?.id === selectedId ? "blue" : "black";
     const formattedDate = moment(item.date).format('YYYY-MM-DD');
-    const html = `
-    <html>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
-        <style>
-          
-  
-          p {
-            font-size: 20px;
-          }
-  
-          .heading {
-            font-size: 50px;
-            font-weight: bold;
-            font-family: 'Helvetica Neue';
-            margin-bottom: 10px;
-          }
-  
-          .normal-text {
-            font-size: 30px;
-            font-family: 'Helvetica Neue';
-            font-weight: normal;
-          }
-  
-          .status {
-            font-size: 30px;
-            font-family: 'Helvetica Neue';
-            font-weight: normal;
-            color: ${getStatusColor(item?.isapproved)};
-          }
-          .abc{
-            display:flex;
-            justify-content:space-evenly;
-            align-items:center;
-          
-          }
-          .xyz{
-            align-self:flex-start;
-          }
-        </style>
-      </head>
-      <body>
-      <p class="heading"><i>Sachivalaya E-Gatepass<i></p>
-      <div class="abc">
+   console.log("roleaaaaaaaaa",authState.role)
+    if(authState?.role===ROLE_TYPE_PASSOFFICE)
+    {
+     printQR(item.phno).then((data)=>{
      
-        <div class="xyz" >
-        <p>
-        <p class="normal-text"><b>Name</b>: ${item?.name}</p>
-        <p class="normal-text"><b>To Meet</b>: ${item?.ename}</p>
-        <p class="normal-text"><b>Department</b>: ${item?.edepartment}</p>
-        <p class="normal-text"><b>Date</b>: ${formattedDate}</p>
-        <p class="normal-text"><b>Time</b>:${item?.time}</p>
-        <p class="normal-text"><b>Status</b>:<span class="status"> ${statusText(item?.isapproved)}<span></p>
-        </div>
-        <div>
-        <img
-          src="https://iammaven.com/v1.0/visitor/image/${item.profile_pic}"
-          style="width: 30vw;"
-        />
-        </div>
-        </div>
-      </body>
-    </html>
-  `;
+      setqrData(data.qrdata)
+     })
+    }
+
+    
+    
+  
   
     const print = async () => {
+
+      const html = `
+      <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+          <style>
+            
+    
+            p {
+              font-size: 20px;
+            }
+    
+            .heading {
+              font-size: 50px;
+              font-weight: bold;
+              font-family: 'Helvetica Neue';
+              margin-bottom: 10px;
+            }
+    
+            .normal-text {
+              font-size: 30px;
+              font-family: 'Helvetica Neue';
+              font-weight: normal;
+            }
+    
+            .status {
+              font-size: 30px;
+              font-family: 'Helvetica Neue';
+              font-weight: normal;
+              color: ${getStatusColor(item?.isapproved)};
+            }
+            .abc{
+              display:flex;
+              justify-content:space-evenly;
+              align-items:center;
+            
+            }
+            .xyz{
+              align-self:flex-start;
+            }
+          </style>
+        </head>
+        <body>
+        <p class="heading"><i>Sachivalaya E-Gatepass<i></p>
+        <div class="abc">
+       
+          <div class="xyz" >
+          <p>
+          <p class="normal-text"><b>Name</b>: ${item?.name}</p>
+          <p class="normal-text"><b>To Meet</b>: ${item?.ename}</p>
+          <p class="normal-text"><b>Department</b>: ${item?.edepartment}</p>
+          <p class="normal-text"><b>Date</b>: ${formattedDate}</p>
+          <p class="normal-text"><b>Time</b>:${item?.time}</p>
+          <p class="normal-text"><b>Status</b>:<span class="status"> ${statusText(item?.isapproved)}<span></p>
+          </div>
+          <div>
+          <img
+            src="https://iammaven.com/v1.0/visitor/image/${item.profile_pic}"
+            style="width: 30vw;"
+          />
+      
+         
+   
+          </div>
+         
+          </div>
+          <div style="display: flex; justify-content: center; align-items: center; ">
+          <span class="normal-text"><b>Please get it scanned by Security</b></span>
+          <img
+            src="${qrData}"
+            style="width: 70vw;"
+          />
+        </div>
+        </body>
+      </html>
+    `;
+
       // On iOS/android prints the given html. On web prints the HTML from the current page.
       await Print.printAsync({
         html,
@@ -349,21 +382,11 @@ const EmployeeListScreen = ({ navigation ,route}: any) => {
    //sendSMSToVisitor(itemObj.phno, msg);
     }
   };
-  //console.log('visitordara',visitorData);
-  // const filteredItemsArray = visitorData.filter((item:any) => {
-  //   const currentTime = new Date();
-  //   return (
-  //     item.date && new Date(item.date).toDateString() !== currentTime.toDateString() || item.isapproved !== 0 || new Date(item.date).toDateString() > currentTime.toDateString()
-  //   );
-  // });
-  // console.log('filteritem',filteredItemsArray);
+  
   const [isButtonActive, setIsButtonActive] = useState<any>(false)
-  //const filteredArray = visitorData.filter((item:any) => !filteredItemsArray.includes(item));
   const toggleButtonState = () => {
     setIsButtonActive(!isButtonActive);
   };
-
-  
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -398,6 +421,10 @@ const EmployeeListScreen = ({ navigation ,route}: any) => {
         {/* <TabButton title="Tab 1" isActive={activeTab === 1} onPress={() => handleTabPress(1)} />
       <TabButton title="Tab 2" isActive={activeTab === 2} onPress={() => handleTabPress(2)} /> */}
       </View>
+   
+      {visitorData && visitorData.length === 0  &&  <View style={styles.noRequestsContainer}>
+          <Text style={styles.noRequestsText}>Nothing to display</Text>
+        </View>}
       <FlatList
         data={visitorData}
         //data={isButtonActive?filteredItemsArray:filteredArray}
@@ -624,65 +651,16 @@ const styles = StyleSheet.create({
   },
   printer: {
     textAlign: 'center',
+  },noRequestsContainer: {
+    padding: 20,
+    backgroundColor: '#f2f2f2', // Set your desired background color
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noRequestsText: {
+    fontSize: 16,
+    color: '#333', // Set your desired text color
+    fontWeight: 'bold',
   },
 });
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     marginTop: StatusBar.currentHeight || 0,
-//     backgroundColor: '#fff', // Set a background color for the container
-//   },
-//   item: {
-//     flexDirection: 'row', // Arrange items horizontally
-//     alignItems: 'center', // Center items vertically
-//     paddingHorizontal: 20,
-//     paddingVertical: 12,
-//     borderBottomWidth: 1,
-//     borderBottomColor: '#ccc', // Add a border to separate items
-//   },
-//   itemText: {
-//     flex: 1, // Allow the text to take remaining space
-//     fontSize: 16,
-//     marginLeft: 10, // Add some space between the text and other elements
-//   },
-//   title: {
-//     fontSize: 20,
-//     fontWeight: 'bold', // Make the title bold
-//   },
-//   modalContainer: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-//   },
-//   modalContent: {
-//     backgroundColor: '#fff',
-//     padding: 20,
-//     borderRadius: 8,
-//     elevation: 5,
-//   },
-//   modalText: {
-//     fontSize: 18,
-//     marginBottom: 20,
-//     textAlign: 'center', // Center the text in the modal
-//   },
-//   modalButtons: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     marginTop: 10,
-//   },
-//   modalButton: {
-//     flex: 1, // Allow buttons to take equal space
-//     paddingVertical: 12,
-//     borderRadius: 8,
-//     alignItems: 'center', // Center the text inside the button
-//   },
-//   modalButtonText: {
-//     color: '#fff',
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//   },
-// });
-
 export default EmployeeListScreen;

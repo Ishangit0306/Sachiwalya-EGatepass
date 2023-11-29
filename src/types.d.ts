@@ -41,7 +41,7 @@ export interface User {
   edesignation?:string,
   fk_eid_caters?:string|number,
   ephone?:string,
-  eid?:string|number
+  eid?:number|null
 }
 
 export interface LoginValues {
@@ -68,7 +68,9 @@ export interface AuthState {
   isLoggedIn: boolean;
   sendSmsStatus?: boolean,
   smsSendToNumber?: number | null,
-  number?:number|null
+  number?:number|null,
+  eid?:number|null,
+  userName?:string|null
 }
 
 export type UserFormData={

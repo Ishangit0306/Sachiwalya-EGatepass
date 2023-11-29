@@ -2,6 +2,8 @@
 
 {
   "expo": {
+    "name":"Uttarakhand Secretariat e-Pass",
+    "slug":"gatepass",
     "icon": "./assets/appicon.png",
     "version": "2.1.0",
 

@@ -20,7 +20,7 @@ const initialValues: LoginFormValues = {
 const loginValidationSchema = yup.object().shape({
     otpNumber: yup.string()
         .required('ENTER YOUR 6 DIGIT OTP NUMBER')
-        .min(6, 'Otp Number must be at least 6 number'),
+        .min(6, 'Otp Number must be at least 6 number').max(6,'Max 6 number is allowed'),
 });
 
 const OTPComponent = ({ navigation, otp ,formdata}: any) => {
