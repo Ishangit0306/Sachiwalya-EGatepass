@@ -36,7 +36,7 @@ const QRCodeScanner = ({ navigation }) => {
 
   const handleBarCodeScanned = ({data }) => {
     //const parsedData=JSON.parse(data);
-    //console.log("innnqr",parsedData);
+    console.log("innnqr",data);
     setScanned(true);
     setShowScanner(false);
     navigation.navigate('QRdisplayScreen',{
@@ -76,7 +76,7 @@ const QRCodeScanner = ({ navigation }) => {
         </>
       );
     } else if (!hasPermission) {
-      return( <Text>No access to camera</Text>);
+      return( <Text>Please Wait, Acessing Camera</Text>);
     }
 
   };

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View, Image, Linking, Alert, BackHandler } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import LogoutButton from '../components/LogoutButton'
 import Icons from '../constants/Icons'
 import QRCodeScanner from './securityDashboard/QRCodeScanner'
@@ -13,8 +13,10 @@ import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Loader from './../components/Loader';
 import { selectAuthenticated } from '../stores/authentication/selectors'
+import { useFocusEffect } from '@react-navigation/native'
 
 const UserDashboardScreen = ({ navigation, route }: any) => {
+    const [active,setActive]=useState(false)
     const dispatch = useAppDispatch();
 //console.log("routeindashboard",route);
     const ID_OPTIONS = [
@@ -129,6 +131,7 @@ if(route.key )
         setShowUploadButton(true)
         const activeuser = await existingUser(params.data);
         if (activeuser) {
+            setActive(true)
             setIsLoading(true);
             navigation.navigate('UserRegistration', { mobile: params.data.mobile, authdata: userData[0] });
         }
@@ -154,6 +157,17 @@ if(route.key )
             }
         
     }
+    useFocusEffect(useCallback(()=>{
+        
+        if(params?.formData ||active ||  dropid===4 )
+        {
+            setIsLoading(false)
+            setShowUploadButton(false)
+            setDropid(1)
+        }
+     
+      
+    },[active,dropid]))
     return (
         isLoading?(<>
             <Loader></Loader>

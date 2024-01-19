@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Platform, BackHandler, Alert } from "react-native";
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Platform, BackHandler, Alert ,KeyboardAvoidingView} from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import Icons from "../constants/Icons";
 import { Dropdown } from "react-native-element-dropdown";
@@ -18,6 +18,7 @@ import { API_BASE_URL, ROLE_TYPE_EMPLOYEE, ROLE_TYPE_SECURITY } from "../utils/c
 import RadioGroup from 'react-native-radio-buttons-group';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import { showToast } from "../components/showToast";
 const ID_OPTIONS = [
   { label: "Aadhar", value: 1 },
   { label: "Voter's ID", value: 2 },
@@ -54,6 +55,7 @@ interface SecurityBookAppointmentValues {
 }
 
 const UserVisitorBookAppointmentScreen = ({ navigation, route }: any) => {
+  const[timezone,setTimezone]=useState(true)
 console.log("route",route)
   useEffect(() => {
     const mobile=route.params.mobile
@@ -81,7 +83,13 @@ console.log("route",route)
   console.log('paramsinuservisitor', params.authdata);
   const { name, address, visitorId } = params?.authdata ? params.authdata : null;
   const { doctype, id_pic, upload_image_id } = params?.authdata ? params.authdata : null;
+useEffect(()=>{
+if(params.authdata.name===null)
+{
+  showToast('Unable to fetch details,Enter details manually.')
+}
 
+},[])
   const formData = params?.formData;
   //console.log(formData?._parts[0][1].uri);
   params = params ?? JSON.stringify(params);
@@ -139,9 +147,62 @@ console.log("route",route)
 
   const handleTimeChange = (event: any, selected: any) => {
     setShowPicker(Platform.OS === 'ios');
+  console.log("checcck",timezone)
     if (selected) {
-
+     
+      console.log("checccksssssssss",timezone)
+      if (timezone) {
+       
+        const currentTime = new Date();
+      
+        // Get the hours and minutes of the current time
+        const currentHours = currentTime.getUTCHours();
+        const currentMinutes = currentTime.getUTCMinutes();
+      
+        // Get the hours and minutes of the selected time
+        const selectedHours = selected.getUTCHours();
+        const selectedMinutes = selected.getUTCMinutes();
+      
+        // Convert the hours to 12-hour format
+        const formattedCurrentHours = currentHours % 12 === 0 ? 12 : currentHours % 12;
+        const formattedSelectedHours = selectedHours % 12 === 0 ? 12 : selectedHours % 12;
+      
+        // Compare the two times
+        if (currentHours > selectedHours || (currentHours === selectedHours && currentMinutes > selectedMinutes)) {
+          // If current time is greater than selected time, it means the selected time is in the past
+          Alert.alert("You can't use a previous time for the same date");
+          setSelectedTime(currentTime)
+        } else {
+          // The selected time is valid, you can proceed with whatever you need to do
+          setSelectedTime(selected);
+        }
+      }
+    //   if(timezone)
+    //   {
+    //     const currentTime = new Date();
+    
+    //     // // Set the date part of currentTime to match the selected time
+    //     // currentTime.setHours(selected.getHours());
+    //     // currentTime.setMinutes(selected.getMinutes());
+    //     console.log("currenttimeeeee......", currentTime.getUTCHours())
+    //     console.log("selected",selected.getUTCHours())
+    //     // Compare the two times
+    //     if (currentTime.getUTCHours() > selected.getUTCHours()) {
+          
+    //       // If current time is greater than selected time, it means the selected time is in the past
+          
+    //       Alert.alert("You can't use a previous time for the same date");
+          
+       
+    //   }
+    //   else{
+    //     setSelectedTime(selected)
+    //   }
+    // }
+    else{
       setSelectedTime(selected);
+    }
+      
       // You can do something with the selected time here, e.g., pass it to a parent component.
     }
   };
@@ -152,8 +213,26 @@ console.log("route",route)
     if (selectedDate) {
       setDate(selectedDate);
     }
+    if (!isToday(selectedDate)) {
+     
+     
+      setTimezone(false);
+    }
+    else
+    {
+      const cur= new Date()
+      setSelectedTime(cur)
+      setTimezone(true)
+    }
   };
-
+  const isToday = (someDate:any) => {
+    const today = new Date();
+    return (
+      someDate.getDate() === today.getDate() &&
+      someDate.getMonth() === today.getMonth() &&
+      someDate.getFullYear() === today.getFullYear()
+    );
+  };
   // Function to show the date picker
   const showDatePickerModal = () => {
     setDatePickerVisible(true);
@@ -273,14 +352,14 @@ console.log("route",route)
   };
 
   const validationSchema = Yup.object().shape({
-    visitername: Yup.string().required('Name is required'),
+    visitername: Yup.string().trim().required('Name is required') .matches(/^[A-Za-z\s]+$/, 'Name should only contain letters and spaces').min(3,'Name must be atleast 3 letter').max(25, 'Name must not exceed 25 characters'),
     //visit_purpose: Yup.string().required('Purpose of visit is required'),
     meeting_purpose: Yup.string(),
     //email_id: Yup.string().email('Invalid email'),
     //contact_number: Yup.string().required(' Visitor Contact number is required'),
     date: Yup.string().required('Date field is required'),
     time: Yup.string().required('Time field is required'),
-    doc_no: Yup.string().required('ID number is required'),
+    doc_no: Yup.string().trim().required('ID number is required').min(3,'Minimum 3 number/letter is required').max(25,'Max 25 letter/number is required'),
     address: Yup.string()
   });
 
@@ -305,129 +384,136 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
     { setSubmitting }: FormikHelpers<SecurityBookAppointmentValues>,
   ) => {
 
-    const formdata = {
-      ...values,
-      employeeId: empid,
-      organization_name: "Uk Secteriate",
-      doc_type: id,
-      apt_date: formatDate(date),
-      apt_time: formatTime(time),
-      dept: dept,
-      designation: designation,
-      officer: ofcr,
-      gender: gender,
-      img: null,
-      emp_id: "0",
-      vid: data?.uid,
-      contact_number: data.contactNumber ? data.contactNumber : params.mobile,
-      visit_purpose: selectedPurpose,
-      visitor_id: '',
-      upload_image_id: upload_image_id ?? "",
-      dv_token:deviceToken
-    };
-    if (!data.uid) {
-      formdata.img = params?.formData
+    if(!data.pic && imageUri===undefined)
+    {
+      Alert.alert("Please Upload Your Photo to Submit")
     }
-    else {
-
-      if (uploadAgain) {
-        formdata.visitor_id = data.uid
+    else{
+      const formdata = {
+        ...values,
+        employeeId: empid,
+        organization_name: "Uk Secteriate",
+        doc_type: id,
+        apt_date: formatDate(date),
+        apt_time: formatTime(time),
+        dept: dept,
+        designation: designation,
+        officer: ofcr,
+        gender: gender,
+        img: null,
+        emp_id: "0",
+        vid: data?.uid,
+        contact_number: data.contactNumber ? data.contactNumber : params.mobile,
+        visit_purpose: selectedPurpose,
+        visitor_id: '',
+        upload_image_id: upload_image_id ?? "",
+        dv_token:deviceToken
+      };
+      if (!data.uid) {
         formdata.img = params?.formData
       }
-    }
-    const dData = desActualData.find((item: any) => item.did == formdata.designation);
-    console.log('dData', dData);
-    const Odata = odata.find((item: any) => item.eid == formdata.officer);
-    const oObj = { "name": Odata.employee, "o_name": Odata.designation, "did": formdata.officer };
-    const dObj = { "name": dData.employee, "d_name": dData.designation, "did": formdata.designation };
-    formdata.designation = JSON.stringify(dObj);
-    formdata.officer = JSON.stringify(oObj);
-    let formData = new FormData();
-    formData.append("organization_name", formdata.organization_name);
-    formData.append("contact_number", formdata.contact_number);
-    formData.append("dept", formdata.dept);
-    formData.append("designation", formdata.designation);
-    formData.append("officer", formdata.officer);
-    formData.append("visitername", formdata.visitername);
-    formData.append("gender", formdata.gender);
-    formData.append("apt_date", formdata.apt_date);
-    formData.append("apt_time", formdata.apt_time);
-    formData.append("visit_purpose", formdata.visit_purpose);
-    formData.append("meeting_purpose", formdata.meeting_purpose);
-    formData.append("doc_type", formdata.doc_type);
-    formData.append("doc_no", formdata.doc_no);
-    formData.append("address", formdata.address);
-    formData.append("email_id", formdata.email_id);
-    formData.append("emp_id", formdata.emp_id);
-    formData.append("img", formdata.img);
-    formData.append("visitor_id", formdata.visitor_id);
-    formData.append("upload_image_id", formdata.upload_image_id);
-    formData.append("dv_token",formdata.dv_token)
-    console.log('uid', data.uid);
-
-    //  console.log('my form data>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#########################', formStoreData);
-
-    //  const ext = visitorImgData.uri.substring(visitorImgData.uri.lastIndexOf(".") + 1);
-
-    //  formData.append("file", {
-    //    uri: visitorImgData.uri,
-    //    type: `image/${ext}`,
-    //    name: visitorImgData.filename,
-    //  });
-
-
-
-
-
-
-
-    // for (const key in formdata) {
-    //   if (formdata.hasOwnProperty(key)) {
-    //     const value = formdata[key];
-    //     postData.append(key, value);  
-    //   }
-    // }
-
-
-    //console.log("dObj",dObj);
-    //console.log('oobj',oObj);
-
-
-
-    //console.log("'form formdata********************',",formdata.designation);
-
-
-    setSubmitting(false);
-    try {
-      const response = data.uid && !uploadAgain
-        ? await saveUserApi(formdata)
-        : await saveUserApi(formData);
-    
-      // Handle the successful API response here
-      if(response.statusCode==200)
-      {
-
-        const cameraScreenData = { ...formdata, "imgFor": "userprofile" };
-        navigation.navigate("ConfirmationScreen", cameraScreenData);
+      else {
+  
+        if (uploadAgain) {
+          formdata.visitor_id = data.uid
+          formdata.img = params?.formData
+        }
       }
-      else
-      {
-        Alert.alert("Something Went Wrong");
+      const dData = desActualData.find((item: any) => item.did == formdata.designation);
+      console.log('dData', dData);
+      const Odata = odata.find((item: any) => item.eid == formdata.officer);
+      const oObj = { "name": Odata.employee, "o_name": Odata.designation, "did": formdata.officer };
+      const dObj = { "name": dData.employee, "d_name": dData.designation, "did": formdata.designation };
+      formdata.designation = JSON.stringify(dObj);
+      formdata.officer = JSON.stringify(oObj);
+      let formData = new FormData();
+      formData.append("organization_name", formdata.organization_name);
+      formData.append("contact_number", formdata.contact_number);
+      formData.append("dept", formdata.dept);
+      formData.append("designation", formdata.designation);
+      formData.append("officer", formdata.officer);
+      formData.append("visitername", formdata.visitername);
+      formData.append("gender", formdata.gender);
+      formData.append("apt_date", formdata.apt_date);
+      formData.append("apt_time", formdata.apt_time);
+      formData.append("visit_purpose", formdata.visit_purpose);
+      formData.append("meeting_purpose", formdata.meeting_purpose);
+      formData.append("doc_type", formdata.doc_type);
+      formData.append("doc_no", formdata.doc_no);
+      formData.append("address", formdata.address);
+      formData.append("email_id", formdata.email_id);
+      formData.append("emp_id", formdata.emp_id);
+      formData.append("img", formdata.img);
+      formData.append("visitor_id", formdata.visitor_id);
+      formData.append("upload_image_id", formdata.upload_image_id);
+      formData.append("dv_token",formdata.dv_token)
+      console.log('uid', data.uid);
+  
+      //  console.log('my form data>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#########################', formStoreData);
+  
+      //  const ext = visitorImgData.uri.substring(visitorImgData.uri.lastIndexOf(".") + 1);
+  
+      //  formData.append("file", {
+      //    uri: visitorImgData.uri,
+      //    type: `image/${ext}`,
+      //    name: visitorImgData.filename,
+      //  });
+  
+  
+  
+  
+  
+  
+  
+      // for (const key in formdata) {
+      //   if (formdata.hasOwnProperty(key)) {
+      //     const value = formdata[key];
+      //     postData.append(key, value);  
+      //   }
+      // }
+  
+  
+      //console.log("dObj",dObj);
+      //console.log('oobj',oObj);
+  
+  
+  
+      //console.log("'form formdata********************',",formdata.designation);
+  
+  
+      setSubmitting(false);
+      try {
+        const response = data.uid && !uploadAgain
+          ? await saveUserApi(formdata)
+          : await saveUserApi(formData);
+      
+        // Handle the successful API response here
+        if(response.statusCode==200)
+        {
+  
+          const cameraScreenData = { ...formdata, "imgFor": "userprofile" };
+          navigation.navigate("ConfirmationScreen", cameraScreenData);
+        }
+        else
+        {
+          Alert.alert("Something Went Wrong");
+        }
+      } catch (error) {
+        // Handle exceptions (errors) that occurred during the API call
+        Alert.alert("API call failed");
+        console.error("API call failed:", error);
+        // You can display an error message to the user or take other appropriate actions.
       }
-    } catch (error) {
-      // Handle exceptions (errors) that occurred during the API call
-      Alert.alert("API call failed");
-      console.error("API call failed:", error);
-      // You can display an error message to the user or take other appropriate actions.
+      // if (id === 4 || id === "none") {
+      //   navigation.navigate("AppointmentFormScreen", {...formdata, "isSimpleForm": true});
+      // } else {
+      //   
+      //   navigation.navigate("ConfirmationScreen", cameraScreenData);
+      // }
+  
+  
     }
-    // if (id === 4 || id === "none") {
-    //   navigation.navigate("AppointmentFormScreen", {...formdata, "isSimpleForm": true});
-    // } else {
-    //   
-    //   navigation.navigate("ConfirmationScreen", cameraScreenData);
-    // }
   };
-
   /*
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -447,7 +533,6 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
   };
   
   */
-
   useFocusEffect(
     React.useCallback(() => {
       if (role === 'employee') {
@@ -498,7 +583,7 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
   const [selectedPurpose, setSelectedPurpose] = useState<any>('Official');
   useEffect(() => {
     setisloading(false);
-    console.log("ishanmydata", data.name);
+  
     if (data.gender != undefined) {
       setGender(data.gender);
     }
@@ -512,8 +597,17 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
       setId(doctype);
     }
   }, [data])
-
+  const formatTimeWithoutSeconds = (time:any) => {
+    const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+    return time.toLocaleTimeString(undefined, options);
+  };
+  useEffect(()=>{},[timezone])
+  console.log("timeeeeeeeeeeeeee",timezone)
   return (
+    <KeyboardAvoidingView
+    behavior={ "height" }
+    style={{ flex: 1 }}
+>
     <View style={{
       flex: 1,
       justifyContent: 'space-evenly',
@@ -577,17 +671,18 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
                     >
                       <Text style={styles.label}>  Select Department <Text style={styles.required}>*</Text></Text>
                       <Dropdown
+                      autoScroll={false}
                         style={styles.dropdown}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
                         inputSearchStyle={styles.inputSearchStyle}
                         data={departmentdata}
-                        search={departmentdata.length >= 5}
+                        search={departmentdata?.length >= 5}
                         maxHeight={300}
                         labelField="label"
                         valueField="value"
                         placeholder="Select Department"
-                        searchPlaceholder={departmentdata.length >= 5 ? "Search..." : undefined}
+                        searchPlaceholder={departmentdata?.length >= 5 ? "Search..." : undefined}
                         value={dept}
                         onChange={(item) => {
                           setDpt(item.value);
@@ -599,6 +694,7 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
                     >
                       <Text style={styles.label}> Select Designation <Text style={styles.required}>*</Text></Text>
                       <Dropdown
+                        autoScroll={false}
                         style={styles.dropdown}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
@@ -623,6 +719,7 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
                     >
                       <Text style={styles.label}>SELECT VISITING OFFICER  <Text style={styles.required}>*</Text></Text>
                       <Dropdown
+                        autoScroll={false}
                         style={styles.dropdown}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
@@ -698,13 +795,13 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
                             mode="time"
                             display="spinner"
                             onChange={handleTimeChange}
-                            is24Hour={true}
+                            is24Hour={false}
                           />
                         )}
                         <TouchableOpacity onPress={showTimePicker} >
                           <TextInput
                             style={styles.input}
-                            value={time.toLocaleTimeString()}
+                            value={formatTimeWithoutSeconds(time)}
                             editable={false}
                           />
                         </TouchableOpacity>
@@ -857,6 +954,7 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
                       onBlur={handleBlur("doc_no")}
                       value={values.doc_no}
                       placeholder="Enter ID Number"
+                      keyboardType={params?.authdata?.doctype===1? "numeric" : "default"}
                     />
                     <Text style={styles.errorTxt}>
                         {touched.doc_no && errors.doc_no
@@ -916,6 +1014,7 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
 
 
     </View >
+    </KeyboardAvoidingView>
   )
 
 }

@@ -113,6 +113,10 @@ const Item = ({
       <Text style={[styles.textLeft, { fontWeight: "bold" }]}>Purpose:</Text>
       <Text style={styles.textRight}>{item?.purpose}</Text>
     </View>
+   {item?.vdesc!=="" && <View style={[styles.textWrap]}>
+      <Text style={[styles.textLeft, { fontWeight: "bold" }]}>Meeting Purpose:</Text>
+      <Text style={styles.textRight}>{item?.vdesc}</Text>
+    </View>}
     <View style={[styles.textWrap]}>
       <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
         Appointment Date & Time:
@@ -190,14 +194,14 @@ const EmployeeListScreen = ({ navigation ,route}: any) => {
     const color = item?.id === selectedId ? "blue" : "black";
     const formattedDate = moment(item.date).format('YYYY-MM-DD');
    console.log("roleaaaaaaaaa",authState.role)
-    if(authState?.role===ROLE_TYPE_PASSOFFICE)
-    {
-     printQR(item.phno).then((data)=>{
+    // if(authState?.role===ROLE_TYPE_PASSOFFICE)
+    // {
+    //  printQR(item.phno).then((data)=>{
      
-      setqrData(data.qrdata)
-     })
-    }
-
+    //   setqrData(data.qrdata)
+    //  })
+    // }
+console.log('iteeeeeeeem',itemObj)
     
     
   
@@ -269,13 +273,7 @@ const EmployeeListScreen = ({ navigation ,route}: any) => {
           </div>
          
           </div>
-          <div style="display: flex; justify-content: center; align-items: center; ">
-          <span class="normal-text"><b>Please get it scanned by Security</b></span>
-          <img
-            src="${qrData}"
-            style="width: 70vw;"
-          />
-        </div>
+          
         </body>
       </html>
     `;
@@ -468,6 +466,12 @@ const EmployeeListScreen = ({ navigation ,route}: any) => {
                   </Text>
                   <Text style={styles.textRight}>{itemObj?.purpose}</Text>
                 </View>
+                {itemObj?.vdesc!=="" || itemObj?.vdesc!==null &&  <View style={[styles.textWrap]}>
+                  <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
+                    Meeting Purpose:
+                  </Text>
+                  <Text style={styles.textRight}>{itemObj?.vdesc}</Text>
+                </View>}
 
                 <View style={[styles.textWrap]}>
                   <Text style={[styles.textLeft, { fontWeight: "bold" }]}>
@@ -585,7 +589,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "#fff",
-    padding: 20,
+    padding: 45,
     borderRadius: 8,
     elevation: 5,
   },

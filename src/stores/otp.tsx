@@ -21,7 +21,7 @@ import { showToast } from "../components/showToast";
                 if (res.statusCode === 200 || res.statusCode === 201) {
                    // console.log('response data are>>>>>>>>>>>', res.otp);
                     //const otpData= res.otp;
-                    showToast();
+                    showToast('Otp Sent Succesfully');
                     navigation.navigate('EnterOTPScreen',{data:res.data});
                     // console.log('login dispatch data', loginData)
                     //dispatch(loginSuccess(loginData));
@@ -82,7 +82,7 @@ import { showToast } from "../components/showToast";
                 if (res.statusCode === 200 || res.statusCode === 201) {
                    // console.log('response data are>>>>>>>>>>>', res.otp);
                     //const otpData= res.otp;
-                    showToast();
+                    showToast('Otp Sent Succesfully');
                     navigation.navigate('EnterOTPScreen',{data:res.data});
                     console.log('resendotp api',res);
                     //navigation.navigate('EnterOTPScreen',{data:res.data});

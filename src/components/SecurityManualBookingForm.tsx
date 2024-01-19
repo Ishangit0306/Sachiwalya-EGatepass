@@ -85,9 +85,19 @@ const SecurityManualBookingForm = ({ formOneData, handleFormSubmit }: any) => {
 
   const bookingValidationSchema = yup.object().shape({
     // visitPurpose: yup.string().required('purposeOfVisit of visit is required'),
-    firstName: yup.string().required('firstName of visit is required'),
-    lastName: yup.string().required('lastName of visit is required'),
-    idNo: yup.string().required('Id Number is required'),
+    firstName: yup.string()
+    .trim()
+    .required('First Name of Visitor is required')
+    .min(2, 'First Name must be at least 2 characters')
+    .max(50, 'First Name must be at most 50 characters')
+    .matches(/^[a-zA-Z ]+$/, 'First Name must only contain letters'),
+    lastName: yup.string().trim()
+    .required('Last Name of Visitor is required')
+    .min(2, 'Last Name must be at least 2 characters')
+    .max(50, 'Last Name must be at most 50 characters')
+    .matches(/^[a-zA-Z ]+$/, 'Last Name must only contain letters'),
+    idNo: yup.string().trim().required('Id Number is required').min(2, 'ID must be at least 2 characters')
+    .max(50, 'ID must be at most 50 characters'),
     // address: yup.string().required('address of visit is required'),
     // date: yup.string().required('date of visit is required'),
     // time: yup.string().required('time of visit is required'),

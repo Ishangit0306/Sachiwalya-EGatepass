@@ -111,7 +111,7 @@ const OTPComponent = ({ navigation, otp ,formdata}: any) => {
 
                    <TouchableOpacity
                         onPress={() => {
-                            showToast();
+                            showToast('Otp Sent Succesfully');
                             resendOtp(expecteddata.mobile, navigation)
                         }}
                         style={styles.resendOTPButton}

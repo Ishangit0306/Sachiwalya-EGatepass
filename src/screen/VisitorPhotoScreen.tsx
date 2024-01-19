@@ -297,7 +297,8 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
       officer_did:params?.officer_did,
       officer_name:params?.officer_name,
       officer_o_name:params?.officer_o_name,
-      submitted_by:eid
+      submitted_by:eid,
+      meeting_purpose:params?.meeting_purpose
     };
 
 
@@ -324,6 +325,7 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
     formData.append("officer_o_name",formStoreData.officer_o_name);
     formData.append("officer_did",formStoreData.officer_did);
     formData.append("submitted_by",formStoreData.submitted_by);
+    formData.append("meeting_purpose",formStoreData.meeting_purpose)
 
     console.log('my form data>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#########################', formStoreData);
 

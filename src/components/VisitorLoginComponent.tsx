@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, TouchableWithoutFeedback, SafeAreaView, Keyboard, ToastAndroid, Alert } from 'react-native'
 import { TextInput } from 'react-native-paper';
 import { Formik, FormikHelpers } from 'formik';
@@ -10,8 +10,10 @@ import { fetchOtpApi, fetchUser } from '../utils/api';
 import { sendOtp } from '../stores/otp';
 import { resetUser, storeuser } from '../stores/userdata/slice';
 import { getUserInfo } from '../stores/userdata/selectors';
-
-
+import { useFocusEffect } from '@react-navigation/native';
+import NetInfo from '@react-native-community/netinfo';
+import { Dropdown } from 'react-native-element-dropdown';
+import AntDesign from '@expo/vector-icons/AntDesign';
 interface LoginFormValues {
     //organizationName: string;
     mobileNumber: string;
@@ -24,38 +26,56 @@ const initialValues: LoginFormValues = {
 
 const loginValidationSchema = yup.object().shape({
     // email: yup.string().email('Invalid email').required('Email is required'),
-   // organizationName: yup.string().required('Please select Organization'),
+    // organizationName: yup.string().required('Please select Organization'),
     mobileNumber: yup.string()
-    .required('Please Enter Mobile Number').min(10, 'Mobile Number must be atleast 10 characters')
-    .matches(/^[0-9]+$/, 'Mobile Number must contain only numbers')
-    .max(10, 'Mobile Number must be at most 10 characters')
+        .required('Please Enter Mobile Number').min(10, 'Mobile Number must be atleast 10 characters')
+        .matches(/^[0-9]+$/, 'Mobile Number must contain only numbers')
+        .max(10, 'Mobile Number must be at most 10 characters')
 });
 
+const Gender = [
+    { label: "UK-Secretariat", value: "UK-Secretariat" },
+    { label: "Police Headquaters", value: "Police Headquaters" },
+  ]
 
+const checkInternetConnection = async () => {
+    const netInfoState = await NetInfo.fetch();
+    if (!netInfoState.isConnected) {
+        // Display a message to the user that there is no internet connection
+        Alert.alert('No Internet Connection', 'Please check your network settings.');
+        return false;
+    }
+    return true;
+};
 
 const VisitorLoginComponent = ({ navigation }: any) => {
+    const [gender,setGender]=useState('UK-Secretariat')
+    const [isSubmit, setIsSubmit] = useState(false);
 
-    const dispatch = useAppDispatch();
+    useFocusEffect(useCallback(() => {
+        console.log("Stateee", isSubmit)
 
-    // const existingUser= async(mobileNumber)=>{
-       
-    //    dispatch(resetUser());
-    //     const existinguser= (await fetchUser(mobileNumber)).data;
-    //     dispatch(storeuser(existinguser));
-    // }
+        setIsSubmit(false)
+    }, []))
 
-   
-    const handleFormSubmit = (
+
+    const handleFormSubmit = async (
+
         values: LoginFormValues,
         { setSubmitting }: FormikHelpers<LoginFormValues>,
     ) => {
         if (values) {
-            sendOtp( values.mobileNumber, navigation );
-           //existingUser(values.mobileNumber)
-        }
-        setSubmitting(false);
-    };
+            if (!(await checkInternetConnection())) {
+                return;
+            }
 
+            setIsSubmit(!isSubmit)
+            sendOtp(values.mobileNumber, navigation);
+            //existingUser(values.mobileNumber)
+        }
+
+    };
+    console.log("issubmitting", isSubmit)
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <SafeAreaView style={{
@@ -77,7 +97,30 @@ const VisitorLoginComponent = ({ navigation }: any) => {
                         <>
                             <View style={styles.inputContainer}>
                                 <Text style={styles.label}>SELECT ORGANIZATION </Text>
-                                <TextInput
+                                <Dropdown
+                                    style={styles.dropdown}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    iconStyle={styles.iconStyle}
+                                    data={Gender}
+                                    maxHeight={300}
+                                    labelField="label"
+                                    valueField="value"
+                                    placeholder={ "SELECT ORGANIZATION"}
+                                    value={gender}
+                                    onChange={(item) => {
+                                        setGender(item.value);
+                                    }}
+                                    renderLeftIcon={() => (
+                                        <AntDesign
+                                            style={styles.icon}
+                                            color="black"
+                                            name="Safety"
+                                            size={20}
+                                        />
+                                    )}
+                                />
+                                {/* <TextInput
                                     style={styles.input}
                                     onChangeText={handleChange('organizationName')}
                                     onBlur={handleBlur('organizationName')}
@@ -85,7 +128,7 @@ const VisitorLoginComponent = ({ navigation }: any) => {
                                     value='UK-Secretariat'
                                     placeholder={'SELECT ORGANISATION'}
                                     editable={false}
-                                />
+                                /> */}
                                 {/* <Text style={styles.errorTxt}>{touched.organizationName && errors.organizationName ? errors.organizationName : null}</Text> */}
                             </View>
                             <View style={styles.inputContainer}>
@@ -95,9 +138,9 @@ const VisitorLoginComponent = ({ navigation }: any) => {
                                     onChangeText={handleChange('mobileNumber')}
                                     onBlur={handleBlur('mobileNumber')}
                                     value={values.mobileNumber}
-                                    keyboardType = "number-pad"
-                                    //placeholder={'Enter password'}
-                                    //secureTextEntry
+                                    keyboardType="number-pad"
+                                //placeholder={'Enter password'}
+                                //secureTextEntry
                                 />
                                 <Text style={{
                                     color: 'red'
@@ -106,27 +149,26 @@ const VisitorLoginComponent = ({ navigation }: any) => {
                                 </Text>
                             </View>
                             <TouchableOpacity
-                                //onPress={() => handleSubmit()}
-                                //vinay here-
-                                onPress={() =>
-                                    {
-                                        handleSubmit()
-                                        //sendOtp({ data: values.mobileNumber, navigation })
-                                    }
-                                  }
-                                style={styles.loginButton}
+
+                                onPress={() => {
+                                    handleSubmit()
+                                    //sendOtp({ data: values.mobileNumber, navigation })
+                                }
+                                }
+                                style={[styles.loginButton, isSubmit && styles.disabledButton]}
+                                disabled={isSubmit}
                             >
                                 <Text style={styles.loginButtonText}>
-                                    {isSubmitting ? 'Submitting...' : 'Submit'}
+                                    {isSubmit ? 'Submitting...' : 'Submit'}
                                 </Text>
                             </TouchableOpacity>
-                            
+
                         </>
                     )}
                 </Formik>
             </SafeAreaView>
         </TouchableWithoutFeedback>
-        
+
 
     )
 }
@@ -214,5 +256,33 @@ const styles = StyleSheet.create({
         color: 'red',
         position: 'absolute',
         bottom: 0
-    }
+    },
+    disabledButton: {
+        backgroundColor: 'gray', // Change the color for disabled state
+        opacity: 0.7, // You can adjust the opacity to visually indicate the disabled state
+    },
+    icon: {
+      marginRight: 5,
+    },
+    placeholderStyle: {
+      borderWidth: 0,
+      fontSize: 16,
+    },
+    selectedTextStyle: {
+      fontSize: 16,
+    },
+    iconStyle: {
+      width: 20,
+      height: 20,
+    },
+    dropdown: {
+      height: 45,
+      borderWidth: 1,
+      borderColor: '#999999',
+      paddingHorizontal: 10,
+      paddingVertical: 7,
+      backgroundColor: '#ffffff',
+      fontSize: 18,
+      color: '#000',
+    },
 });

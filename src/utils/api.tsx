@@ -544,6 +544,7 @@ export const fetchOfficer = async (dept: number, desig: number) => {
 };
 
 export const fetchOtpApi = async (data: any) => {
+  
   const requestData = data;
  
   const requestBody = {
@@ -1098,6 +1099,39 @@ export const printQR = async (data:any) => {
     return {
       qrdata: null,
       message: data.message,
+      statusCode: 404,
+      error: true,
+    };
+  }
+
+  
+};
+
+
+export const passwordResetapi = async (data:any,eid:any) => {
+  
+  console.log("eeeid",eid)
+  const requestBody={
+      "epassword":data.newPassword,
+      "oldpass":data.oldPassword
+  }
+  console.log("requestbody",requestBody)
+  const response = await fetch(`${API_BASE_URL}/v1.0/user/update-info/${eid}`, {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body:JSON.stringify(requestBody)
+  });
+  if (response.ok) {
+    return {
+      message: 'success',
+      statusCode: 200,
+    };
+  } else {
+    return {
+      message:"fail",
       statusCode: 404,
       error: true,
     };

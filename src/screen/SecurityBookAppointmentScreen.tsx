@@ -7,8 +7,9 @@ import {
   View,
   ScrollView,
   Platform,
+  Alert,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Icons from '../constants/Icons';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -31,6 +32,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { resetPhotoState } from '../stores/appointment/slice';
 import { ROLE_TYPE_EMPLOYEE, ROLE_TYPE_SECURITY } from '../utils/config';
 import { curryGetDefaultMiddleware } from '@reduxjs/toolkit/dist/getDefaultMiddleware';
+import { RadioGroup } from 'react-native-radio-buttons-group';
 
 const ID_OPTIONS = [
   { label: 'Aadhar', value: 1 },
@@ -54,11 +56,13 @@ type DocumentType = DOC_ADHAR_ID | DOC_VOTER_ID | DOC_VECHICLE_ID | DOC_NONE;
 interface SecurityBookAppointmentValues {
   //departmentName: string,
   // employeeId: number | string,
-  visitPurpose: string;
+  //visitPurpose: string;
   contactNumber: string;
   date: string;
   time: string;
   email: string;
+  id: string;
+  meeting_purpose:string;
   // documentType: DocumentType,
 }
 
@@ -79,7 +83,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
   //   }
   // },[])
   const [departmentData, setDepartmentData] = useState([]);
-
+  const[timezone,setTimezone]=useState(true)
   useEffect(() => {
     fetchDepartment().then((data) => {
       const departmentArray = data.data.map(
@@ -194,11 +198,75 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
 
   const handleTimeChange = (event: any, selected: any) => {
     setShowPicker(Platform.OS === 'ios');
-    if (selected) {
-      console.log('handletime',selected);
-      setSelectedTime(selected);
-      // You can do something with the selected time here, e.g., pass it to a parent component.
-    }
+    
+      if (selected) {
+       
+        console.log("checccksssssssss",timezone)
+        if (timezone) {
+         
+          const currentTime = new Date();
+        
+          // Get the hours and minutes of the current time
+          const currentHours = currentTime.getUTCHours();
+          const currentMinutes = currentTime.getUTCMinutes();
+        
+          // Get the hours and minutes of the selected time
+          const selectedHours = selected.getUTCHours();
+          const selectedMinutes = selected.getUTCMinutes();
+        
+          // Convert the hours to 12-hour format
+          const formattedCurrentHours = currentHours % 12 === 0 ? 12 : currentHours % 12;
+          const formattedSelectedHours = selectedHours % 12 === 0 ? 12 : selectedHours % 12;
+        
+          // Compare the two times
+          if (currentHours > selectedHours || (currentHours === selectedHours && currentMinutes > selectedMinutes)) {
+            // If current time is greater than selected time, it means the selected time is in the past
+            Alert.alert("You can't use a previous time for the same date");
+            setSelectedTime(currentTime)
+          } else {
+            // The selected time is valid, you can proceed with whatever you need to do
+            setSelectedTime(selected);
+          }
+        }
+      //   if(timezone)
+      //   {
+      //     const currentTime = new Date();
+      
+      //     // // Set the date part of currentTime to match the selected time
+      //     // currentTime.setHours(selected.getHours());
+      //     // currentTime.setMinutes(selected.getMinutes());
+      //     console.log("currenttimeeeee......", currentTime.getUTCHours())
+      //     console.log("selected",selected.getUTCHours())
+      //     // Compare the two times
+      //     if (currentTime.getUTCHours() > selected.getUTCHours()) {
+            
+      //       // If current time is greater than selected time, it means the selected time is in the past
+            
+      //       Alert.alert("You can't use a previous time for the same date");
+            
+         
+      //   }
+      //   else{
+      //     setSelectedTime(selected)
+      //   }
+      // }
+      else{
+        setSelectedTime(selected);
+      }
+        
+        // You can do something with the selected time here, e.g., pass it to a parent component.
+      }
+    // setShowPicker(Platform.OS === 'ios');
+    // if (selected) {
+    //   console.log('handletime', selected);
+    //   setSelectedTime(selected);
+    //   // You can do something with the selected time here, e.g., pass it to a parent component.
+    // }
+    // // if (selected !== undefined) {
+    // //   const newTime = new Date(date);
+    // //   newTime.setHours(selected.getHours(), selected.getMinutes());
+    // //   setSelectedTime(newTime);
+    // // }
   };
   //time
   // Function to handle date selection
@@ -207,8 +275,26 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
     if (selectedDate) {
       setDate(selectedDate);
     }
+    if (!isToday(selectedDate)) {
+     
+     
+      setTimezone(false);
+    }
+    else
+    {
+      const cur= new Date()
+      setSelectedTime(cur)
+      setTimezone(true)
+    }
   };
-
+  const isToday = (someDate:any) => {
+    const today = new Date();
+    return (
+      someDate.getDate() === today.getDate() &&
+      someDate.getMonth() === today.getMonth() &&
+      someDate.getFullYear() === today.getFullYear()
+    );
+  };
   // Function to show the date picker
   const showDatePickerModal = () => {
     setDatePickerVisible(true);
@@ -220,7 +306,20 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
   };
 
   //date time state end
+  const radioButtons = useMemo(() => ([
+    {
+      id: 'Official', // acts as primary key, should be unique and non-empty string
+      label: 'Official',
+      value: 'Official'
+    },
+    {
+      id: 'Others',
+      label: 'Others',
+      value: 'Others'
+    }
+  ]), []);
 
+  const [selectedPurpose, setSelectedPurpose] = useState<any>('Official');
   //state start
   const [id, setId] = useState<any>(0); // doc id
   const [empid, setEmpid] = useState<any>(user ? user.id : 0); // employee id
@@ -231,12 +330,14 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
     //departmentName: role === ROLE_TYPE_EMPLOYEE ? user?.departmentName : '',
     email: '',
     // employeeId: '',
-    visitPurpose: '',
+    //visitPurpose: '',
     contactNumber: '',
     // date: role === ROLE_TYPE_EMPLOYEE ? currentDate.toLocaleDateString() : currentDate.toLocaleDateString(),
     date: role === ROLE_TYPE_EMPLOYEE ? formatDate(new Date()) : formatDate(new Date()),
     // time: role === ROLE_TYPE_EMPLOYEE ? currentDate.toLocaleTimeString() : currentDate.toLocaleTimeString(),
     time: role === ROLE_TYPE_EMPLOYEE ? formatTime(new Date()) : formatTime(new Date()),
+    id: '',
+    meeting_purpose: '',
     // documentType: 0,
   };
 
@@ -244,11 +345,20 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
   const validationSchema = Yup.object().shape({
     //departmentName: Yup.string().required('department name is required'),
     // employeeId: Yup.string().required('select the employee id'),
-    visitPurpose: Yup.string().required('Purpose of visit is required'),
+    // visitPurpose: Yup.string()
+    //   .trim()
+    //   .required('Purpose of visit is required')
+    //   .min(2, 'Purpose of visit must be at least 2 characters')
+    //   .max(255, 'Purpose of visit must be at most 255 characters')
+    // ,
     email: Yup.string().email('Invalid email'),
-    contactNumber: Yup.string().required(' Visitor Contact number is required'),
+    contactNumber: Yup.string()
+      .matches(/^[0-9]{10}$/, 'Invalid phone number')
+      .required('Visitor Contact number is required'),
     date: Yup.string().required('Date field is required'),
     time: Yup.string().required('Time field is required'),
+    id: Yup.string().required('Id is required'),
+    meeting_purpose: Yup.string(),
   });
 
   const handleFormSubmit = (
@@ -261,27 +371,30 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
       documentType: id,
       date: formatDate(date),
       time: formatTime(time),
-      designation:desig,
+      designation: desig,
       officer: empid,
       dept: dept,
-      officer_name:'',
-      officer_o_name:'',
-      officer_did:'',
-      designation_d_name:'',
-      designation_name :'',
-      designation_did:'',
+      officer_name: '',
+      officer_o_name: '',
+      officer_did: '',
+      designation_d_name: '',
+      designation_name: '',
+      designation_did: '',
+      visitPurpose:selectedPurpose,
+      
     };
     const dData = desActualData.find((item: any) => item.did == formdata.designation);
     const Odata = odata.find((item: any) => item.eid == formdata.officer);
-   
     formdata.officer_name = Odata.employee
-    formdata. officer_o_name=Odata.designation
-    formdata. officer_did=formdata.officer 
-    formdata.designation_name=dData.employee
-    formdata.designation_d_name=dData.designation
-    formdata.designation_did= formdata.designation 
+    formdata.officer_o_name = Odata.designation
+    formdata.officer_did = formdata.officer
+    formdata.designation_name = dData.employee
+    formdata.designation_d_name = dData.designation
+    formdata.designation_did = formdata.designation
+    formdata.meeting_purpose=formdata.meeting_purpose
     //const oObj = { "name": Odata.employee, "o_name": Odata.designation, "did": formdata.officer };
     //const dObj = { "name": dData.employee, "d_name": dData.designation, "did": formdata.designation };
+    console.log("meeting_purpose",formdata.meeting_purpose)
     console.log('form formdata********************', formdata);
     setSubmitting(false);
 
@@ -344,7 +457,11 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
       dispatch(resetPhotoState());
     }, [role])
   );
-
+  const formatTimeWithoutSeconds = (time: any) => {
+    const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+    return time.toLocaleTimeString(undefined, options);
+  };
+  useEffect(()=>{},[timezone])
   return (
     <View
       style={{
@@ -388,6 +505,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                 errors,
                 touched,
                 isSubmitting,
+                setFieldValue
               }) => (
                 <View
                   style={{
@@ -404,6 +522,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                     <View style={styles.inputContainer}>
                       <Text style={styles.label}>Select Department  <Text style={styles.required}>*</Text></Text>
                       <Dropdown
+                        autoScroll={false}
                         style={styles.dropdown}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
@@ -413,7 +532,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                         maxHeight={300}
                         labelField='label'
                         valueField='value'
-                        placeholder= {'Select Department'}
+                        placeholder={'Select Department'}
                         searchPlaceholder='Search...'
                         value={dept}
                         onChange={(item) => {
@@ -425,6 +544,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                     <View style={styles.inputContainer}>
                       <Text style={styles.label}>Select Designation  <Text style={styles.required}>*</Text></Text>
                       <Dropdown
+                        autoScroll={false}
                         style={styles.dropdown}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
@@ -434,7 +554,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                         maxHeight={300}
                         labelField='label'
                         valueField='value'
-                        placeholder= {'Select Designation'}
+                        placeholder={'Select Designation'}
                         searchPlaceholder='Search...'
                         value={desig}
                         onChange={(item) => {
@@ -446,6 +566,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                     <View style={styles.inputContainer}>
                       <Text style={styles.label}>Whom to Meet  <Text style={styles.required}>*</Text></Text>
                       <Dropdown
+                        autoScroll={false}
                         style={styles.dropdown}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
@@ -455,7 +576,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                         maxHeight={300}
                         labelField='label'
                         valueField='value'
-                        placeholder= {'Whom to Meet'}
+                        placeholder={'Whom to Meet'}
                         searchPlaceholder='Search...'
                         value={empid}
                         onChange={(item) => {
@@ -470,7 +591,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                     </View>
                   </View>
 
-                  <View style={styles.inputContainer}>
+                  {/* <View style={styles.inputContainer}>
                     <Text style={styles.label}>Purpose of Visit  <Text style={styles.required}>*</Text></Text>
                     <TextInput
                       style={styles.input}
@@ -484,7 +605,49 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                         ? errors.visitPurpose
                         : null}
                     </Text>
+                  </View> */}
+                  <View
+                    style={styles.inputContainer}
+                  >
+                    <Text style={styles.label}>Purpose of Visit</Text>
+                    {/* <TextInput
+                      style={styles.input}
+                      onChangeText={handleChange("visit_purpose")}
+                      onBlur={handleBlur("visit_purpose")}
+                      value={values.visit_purpose}
+                      placeholder="Purpose of Visit"
+                    />
+                    <Text style={styles.errorTxt}>
+                      {touched.visit_purpose && errors.visit_purpose
+                        ? errors.visit_purpose
+                        : null}
+                    </Text> */}
+                    <View style={styles.radioGroup}>
+                      <RadioGroup
+                        layout="row"
+                        radioButtons={radioButtons}
+                        onPress={setSelectedPurpose}
+                        selectedId={selectedPurpose}
+                      />
+                    </View>
                   </View>
+                  {(selectedPurpose === 'Others') && <View
+                    style={styles.inputContainer}
+                  >
+                    <Text style={styles.label}>Purpose of Meeting</Text>
+                    <TextInput
+                      style={styles.input}
+                      onChangeText={handleChange("meeting_purpose")}
+                      onBlur={handleBlur("meeting_purpose")}
+                      value={values.meeting_purpose}
+                      placeholder="Purpose of Meeting"
+                    />
+                    {/* <Text style={styles.errorTxt}>
+                      {touched.meeting_purpose && errors.meeting_purpose
+                        ? errors.meeting_purpose
+                        : null}
+                    </Text> */}
+                  </View>}
                   <View style={styles.inputContainer}>
                     <Text style={styles.label}>Visitor Email</Text>
                     <TextInput
@@ -544,7 +707,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
 
                       <TouchableOpacity
                         onPress={showDatePickerModal}
-                        >
+                      >
                         <TextInput
                           style={styles.input}
                           value={date.toDateString()}
@@ -572,15 +735,16 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                           mode='time'
                           display='spinner'
                           onChange={handleTimeChange}
-                          is24Hour={true}
+                          is24Hour={false}
+                        //minimumDate={date.getTime() === new Date().getTime() ? new Date() : new Date(2000, 0, 1)}// Set to a past date and time
                         />
                       )}
                       <TouchableOpacity
                         onPress={showTimePicker}
-                        >
+                      >
                         <TextInput
                           style={styles.input}
-                          value={time.toLocaleTimeString()}
+                          value={formatTimeWithoutSeconds(time)}
                           editable={false}
                         />
                       </TouchableOpacity>
@@ -607,8 +771,9 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                       labelField='label'
                       valueField='value'
                       placeholder='Select an ID'
-                      value={id}
+                      value={values.id}
                       onChange={(item) => {
+                        setFieldValue('id', item.value)
                         setId(item.value);
                       }}
                       renderLeftIcon={() => (
@@ -620,7 +785,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
                         />
                       )}
                     />
-                    <Text style={styles.errorTxt}>{``}</Text>
+                    <Text style={styles.errorTxt}> {touched.id && errors.id ? errors.id : null}</Text>
                   </View>
 
                   <TouchableOpacity
@@ -682,6 +847,11 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  radioGroup: {
+    flexDirection: 'row', // or 'column' for vertical alignment
+    justifyContent: 'space-between',
+    width: 100, // adjust to your desired width
   },
   dropdownStyle: {
     backgroundColor: '#fafafa',

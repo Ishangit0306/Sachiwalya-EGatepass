@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, TouchableOpacity, TouchableWithoutFeedback, SafeAreaView, Keyboard } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, TouchableWithoutFeedback, SafeAreaView, Keyboard, Alert } from 'react-native'
 import { TextInput } from 'react-native-paper';
 import { Formik, FormikHelpers } from 'formik';
 import * as yup from 'yup';
@@ -8,6 +8,8 @@ import { authLogin } from '../stores/authentication/userAuthenticate';
 import * as Notifications from 'expo-notifications';
 import { tokens } from 'react-native-paper/lib/typescript/styles/themes/v3/tokens';
 import Constants from 'expo-constants';
+import NetInfo from '@react-native-community/netinfo';
+import Icon from 'react-native-vector-icons/FontAwesome';
 interface LoginFormValues {
     email: string;
     password: string;
@@ -31,30 +33,59 @@ const loginValidationSchema = yup.object().shape({
 //   }).then((data)=>{ 
 //     deviceToken = data.data
 // })
-let deviceToken:any
+let deviceToken: any
 if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.extra.eas) {
-  Notifications.getExpoPushTokenAsync({
-    projectId: Constants.expoConfig.extra.eas.projectId,
-  }).then((data) => {
-    deviceToken = data.data;
-  });
+    Notifications.getExpoPushTokenAsync({
+        projectId: Constants.expoConfig.extra.eas.projectId,
+    }).then((data) => {
+        deviceToken = data.data;
+    });
 } else {
-  console.error("Some properties in Constants.expoConfig are undefined");
+    console.error("Some properties in Constants.expoConfig are undefined");
 }
 const LoginComponent = ({ navigation }: any) => {
+    const [isSubmit, setIsSubmit] = useState(false);
+    const checkInternetConnection = async () => {
+        const netInfoState = await NetInfo.fetch();
+        if (!netInfoState.isConnected) {
+            // Display a message to the user that there is no internet connection
+            Alert.alert('No Internet Connection', 'Please check your network settings.');
+            return false;
+        }
+        return true;
+    };
     const dispatch = useAppDispatch();
 
-    const handleFormSubmit = (
+    const handleFormSubmit = async (
         values: LoginFormValues,
         { setSubmitting }: FormikHelpers<LoginFormValues>,
     ) => {
         if (values) {
-            const requestData={...values,deviceToken}
+            if (!(await checkInternetConnection())) {
+                return;
+            }
+            //   /setIsSubmit(true)
+            console.log("staet", isSubmit)
+            const requestData = { ...values, deviceToken }
             dispatch(authLogin({ data: requestData, navigation }));
         }
-        setSubmitting(false);
+        //setSubmitting(false);
     };
-
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isEyeIconDisabled, setIsEyeIconDisabled] = useState(true);
+    const enableEyeIcon = () => {
+        setIsEyeIconDisabled(false);
+      };
+    
+      const disableEyeIcon = () => {
+        setIsEyeIconDisabled(true);
+      };
+    
+      const togglePasswordVisibility = () => {
+        if (!isEyeIconDisabled) {
+          setIsPasswordVisible(!isPasswordVisible);
+        }
+      };
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <SafeAreaView style={{
@@ -93,20 +124,48 @@ const LoginComponent = ({ navigation }: any) => {
                                     onBlur={handleBlur('password')}
                                     value={values.password}
                                     placeholder={'Enter password'}
-                                    secureTextEntry
+                                    secureTextEntry={!isPasswordVisible}
                                 />
-                                <Text style={{
-                                    color: 'red'
-                                }}>
+                                <TouchableOpacity
+                                    style={styles.eyeIcon}
+                                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                                >
+                                    <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={20} color="black" />
+                                </TouchableOpacity>
+                                <Text style={{ color: 'red' }}>
                                     {touched.password && errors.password ? errors.password : null}
                                 </Text>
                             </View>
+                            {/* <View style={styles.inputContainer}>
+                                <Text style={styles.label}>Password</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    onChangeText={handleChange('password')}
+                                    onBlur={handleBlur('password')}
+                                    value={values.password}
+                                    placeholder={'Enter password'}
+                                    secureTextEntry={!isPasswordVisible}
+                                />
+                                <TouchableOpacity
+                                    style={styles.eyeIcon}
+                                    onPressIn={enableEyeIcon}
+                                    onPressOut={disableEyeIcon}
+                                    onPress={togglePasswordVisibility}
+                                    disabled={isEyeIconDisabled}
+                                >
+                                    <Icon name={isPasswordVisible ? 'eye-slash' : 'eye'} size={20} color="black" />
+                                </TouchableOpacity>
+                                <Text style={{ color: 'red' }}>
+                                    {touched.password && errors.password ? errors.password : null}
+                                </Text>
+                            </View> */}
                             <TouchableOpacity
                                 onPress={() => handleSubmit()}
-                                style={styles.loginButton}
+                                style={[styles.loginButton, isSubmit && styles.disabledButton]}
+                                disabled={isSubmit}
                             >
                                 <Text style={styles.loginButtonText}>
-                                    {isSubmitting ? 'Login...' : 'Login'}
+                                    {isSubmit ? 'Login...' : 'Login'}
                                 </Text>
                             </TouchableOpacity>
                         </>
@@ -127,6 +186,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#f0f0f0',
+    },
+    disabledButton: {
+        backgroundColor: 'gray', // Change the color for disabled state
+        opacity: 0.7, // You can adjust the opacity to visually indicate the disabled state
     },
     title: {
         fontSize: 24,
@@ -200,5 +263,9 @@ const styles = StyleSheet.create({
         color: 'red',
         position: 'absolute',
         bottom: 0
-    }
+    }, eyeIcon: {
+        position: 'absolute',
+        top: 35, // Adjust the top position as needed
+        right: 10, // Adjust the right position as needed
+    },
 });

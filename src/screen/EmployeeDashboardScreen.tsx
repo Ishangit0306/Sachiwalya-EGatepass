@@ -38,6 +38,9 @@ const EmployeeDashboardScreen = ({ navigation }: any) => {
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EmployeeListScreen')}>
           <Text style={styles.buttonText}>Visitor List</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('PasswordResetScreen')}>
+          <Text style={styles.buttonText}>Reset Password</Text>
+        </TouchableOpacity>
         <LogoutButton />
       </View>
     </View>

@@ -23,6 +23,7 @@ import UserVisitorBookAppointmentScreen from "../screen/UserVisitorBookAppointme
 import UserCapturePhotoScreen from "../screen/UserCapturePhotoScreen";
 import ConfirmationScreen from "../screen/ConfirmationScreen";
 import UserDashboardScreen from "../screen/UserDashboardScreen";
+import PasswordResetScreen from "../screen/PasswordResetScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -187,6 +188,16 @@ const DashboardRoutes = ({ role }: any) => {
                     headerTitleAlign: "center",
                 })}
             />
+                 <Stack.Screen
+                name="PasswordResetScreen"
+                component={PasswordResetScreen}
+                options={() => ({
+                    headerShown: true,
+                    headerTitle: "Reset Password",
+                    headerTitleAlign: "center",
+                })}
+            />
+            
         </Stack.Navigator>
     );
 };
