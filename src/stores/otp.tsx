@@ -5,7 +5,8 @@ import { resetUser, storeuser } from "./userdata/slice";
 import { useAppDispatch } from "./hooks";
 import { showToast } from "../components/showToast";
 
- export const sendOtp = async (data: any, navigation: any)=> {
+ export const sendOtp = async (data: any, navigation: any,org:any)=> {
+    console.log("orrrggname",org)
         try {
             if (data) {
                 const res = await fetchOtpApi(data);
@@ -22,7 +23,7 @@ import { showToast } from "../components/showToast";
                    // console.log('response data are>>>>>>>>>>>', res.otp);
                     //const otpData= res.otp;
                     showToast('Otp Sent Succesfully');
-                    navigation.navigate('EnterOTPScreen',{data:res.data});
+                    navigation.navigate('EnterOTPScreen',{data:res.data,org});
                     // console.log('login dispatch data', loginData)
                     //dispatch(loginSuccess(loginData));
                     //return;

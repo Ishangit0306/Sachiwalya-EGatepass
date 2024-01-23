@@ -43,7 +43,8 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
 } else {
     console.error("Some properties in Constants.expoConfig are undefined");
 }
-const LoginComponent = ({ navigation }: any) => {
+const LoginComponent = ({ navigation,route }: any) => {
+    console.log("in login",route)
     const [isSubmit, setIsSubmit] = useState(false);
     const checkInternetConnection = async () => {
         const netInfoState = await NetInfo.fetch();
@@ -66,7 +67,7 @@ const LoginComponent = ({ navigation }: any) => {
             }
             //   /setIsSubmit(true)
             console.log("staet", isSubmit)
-            const requestData = { ...values, deviceToken }
+            const requestData = { ...values, deviceToken,orgName:route }
             dispatch(authLogin({ data: requestData, navigation }));
         }
         //setSubmitting(false);

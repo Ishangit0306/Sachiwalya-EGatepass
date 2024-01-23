@@ -421,8 +421,8 @@ export const scannedDocumentApi = async (data: FormData, token: string) => {
   }
 };
 
-export const fetchDepartment = async () => {
-  const dorganisation = 'Secreteriat';
+export const fetchDepartment = async (orgName:any) => {
+  const dorganisation = orgName;
   try {
     const response = await fetch(
       `${API_BASE_URL}/v1.0/master/departments-list/${dorganisation}`,
@@ -461,9 +461,9 @@ export const fetchDepartment = async () => {
   }
 };
 
-export const fetchDesignation = async (dept: number) => {
+export const fetchDesignation = async (orgName:any,dept: number) => {
   console.log('dept', dept);
-  const dorganisation = 'Secreteriat';
+  const dorganisation = orgName;
   try {
     const response = await fetch(
       `${API_BASE_URL}/v1.0/master/designations-list/${dorganisation}/${dept}`,
@@ -502,9 +502,9 @@ export const fetchDesignation = async (dept: number) => {
   }
 };
 
-export const fetchOfficer = async (dept: number, desig: number) => {
+export const fetchOfficer = async (orgName:any,dept: number, desig: number) => {
   console.log('dept', dept);
-  const dorganisation = 'Secreteriat';
+  const dorganisation = orgName;
   try {
     const response = await fetch(
       `${API_BASE_URL}/v1.0/master/visiting-officer-list/${dorganisation}/${dept}/${desig}`,
@@ -791,9 +791,12 @@ if (vid) {
    
 }
 
-export const departmentName = async () => {
+export const departmentName = async (org:any) => {
   try {
-      const dept = "Secreteriat";
+  
+ 
+      const dept = org;
+      console.log("getting dept",dept)
       const response = await fetch(`${API_BASE_URL}/v1.0/master/departments-list/${dept}`, {
           method: 'GET',
           headers: {
@@ -831,10 +834,12 @@ export const departmentName = async () => {
 };
 
 
-export const designationName = async (dept:any) => {
+export const designationName = async (orgName:any,dept:any) => {
+  console.log("issssssssssss",orgName);
   try {
+    console.log("org in designation",orgName)
       //const dept = "UK Secreteriat";
-      const response = await fetch(`${API_BASE_URL}/v1.0/master/designations-list/Secreteriat/${dept}`, {
+      const response = await fetch(`${API_BASE_URL}/v1.0/master/designations-list/${orgName}/${dept}`, {
           method: 'GET',
           headers: { 
               'Accept': 'application/json',
@@ -876,11 +881,12 @@ export const designationName = async (dept:any) => {
   }
 };
 
-export const officerName = async (dept:any,designation:any) => {
+export const officerName = async (orgName:any,dept:any,designation:any) => {
   try {
+
       //const dept = "UK Secreteriat";
       console.log('designation',designation);
-      const response = await fetch(`${API_BASE_URL}/v1.0/master/visiting-officer-list/Secreteriat/${dept}/${designation}`, {
+      const response = await fetch(`${API_BASE_URL}/v1.0/master/visiting-officer-list/${orgName}/${dept}/${designation}`, {
           method: 'GET',
           headers: {
                Accept: 'application/json',

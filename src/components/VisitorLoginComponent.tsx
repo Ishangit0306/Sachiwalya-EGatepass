@@ -34,8 +34,8 @@ const loginValidationSchema = yup.object().shape({
 });
 
 const Gender = [
-    { label: "UK-Secretariat", value: "UK-Secretariat" },
-    { label: "Police Headquaters", value: "Police Headquaters" },
+    { label: "UK-Secretariat", value: "Secreteriat" },
+    { label: "Police Headquaters", value: "POLICE HEAD QUARTER" },
   ]
 
 const checkInternetConnection = async () => {
@@ -48,8 +48,9 @@ const checkInternetConnection = async () => {
     return true;
 };
 
-const VisitorLoginComponent = ({ navigation }: any) => {
-    const [gender,setGender]=useState('UK-Secretariat')
+const VisitorLoginComponent = ({ navigation ,org}: any) => {
+
+    //const [org,setOrg]=useState(orgN)
     const [isSubmit, setIsSubmit] = useState(false);
 
     useFocusEffect(useCallback(() => {
@@ -70,12 +71,12 @@ const VisitorLoginComponent = ({ navigation }: any) => {
             }
 
             setIsSubmit(!isSubmit)
-            sendOtp(values.mobileNumber, navigation);
+            sendOtp(values.mobileNumber, navigation,org);
             //existingUser(values.mobileNumber)
         }
 
     };
-    console.log("issubmitting", isSubmit)
+    //console.log("issubmitting", isSubmit)
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <SafeAreaView style={{
@@ -95,42 +96,6 @@ const VisitorLoginComponent = ({ navigation }: any) => {
                         isSubmitting,
                     }) => (
                         <>
-                            <View style={styles.inputContainer}>
-                                <Text style={styles.label}>SELECT ORGANIZATION </Text>
-                                <Dropdown
-                                    style={styles.dropdown}
-                                    placeholderStyle={styles.placeholderStyle}
-                                    selectedTextStyle={styles.selectedTextStyle}
-                                    iconStyle={styles.iconStyle}
-                                    data={Gender}
-                                    maxHeight={300}
-                                    labelField="label"
-                                    valueField="value"
-                                    placeholder={ "SELECT ORGANIZATION"}
-                                    value={gender}
-                                    onChange={(item) => {
-                                        setGender(item.value);
-                                    }}
-                                    renderLeftIcon={() => (
-                                        <AntDesign
-                                            style={styles.icon}
-                                            color="black"
-                                            name="Safety"
-                                            size={20}
-                                        />
-                                    )}
-                                />
-                                {/* <TextInput
-                                    style={styles.input}
-                                    onChangeText={handleChange('organizationName')}
-                                    onBlur={handleBlur('organizationName')}
-                                    //value={values.organizationName}
-                                    value='UK-Secretariat'
-                                    placeholder={'SELECT ORGANISATION'}
-                                    editable={false}
-                                /> */}
-                                {/* <Text style={styles.errorTxt}>{touched.organizationName && errors.organizationName ? errors.organizationName : null}</Text> */}
-                            </View>
                             <View style={styles.inputContainer}>
                                 <Text style={styles.label}>ENTER YOUR MOBILE NUMBER</Text>
                                 <TextInput

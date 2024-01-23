@@ -40,7 +40,8 @@ const authenticate =
 
               },
               token: res.data.token,
-              role: res.data.role
+              role: res.data.role,
+              orgName:data.orgName,
             };
 
             console.log('login dispatch data', loginData)

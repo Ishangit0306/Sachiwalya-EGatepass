@@ -6,7 +6,8 @@ import LoginComponent from '../components/LoginComponent';
 import { useAppSelector } from '../stores/hooks';
 import { selectAuthenticated } from '../stores/authentication/selectors';
 
-const AdminScreen = ({ navigation }: any) => {
+const AdminScreen = ({ navigation ,route}: any) => {
+  console.log("inadmin",route)
   const authState = useAppSelector(selectAuthenticated);
 
   console.log('user current state data are>>>>>>>>>>', authState)
@@ -57,7 +58,7 @@ const AdminScreen = ({ navigation }: any) => {
         alignItems: 'center'
       }}>
         {/* Login compoenent */}
-        <LoginComponent navigation={navigation} />
+        <LoginComponent navigation={navigation} route={route.params.org} />
       </View>
     </View>
     </KeyboardAvoidingView>

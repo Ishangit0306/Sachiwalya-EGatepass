@@ -6,6 +6,7 @@ export type LoginPayloadType = {
   user: User;
   token: string;
   role: string | number;
+ orgName:string;
 };
 
 const initialState: AuthState = {
@@ -15,7 +16,8 @@ const initialState: AuthState = {
   isLoggedIn: false,
   sendSmsStatus: false,
   smsSendToNumber: null,
-  number:null
+  number:null,
+  orgName:null,
 };
 
 export const slice = createSlice({
@@ -26,7 +28,7 @@ export const slice = createSlice({
       state,
       action: PayloadAction<LoginPayloadType>,
     ) => {
-      const { user, token, role } = action.payload;
+      const { user, token, role ,orgName} = action.payload;
 
       return {
         ...state,
@@ -34,7 +36,8 @@ export const slice = createSlice({
         token,
         role,
         isLoggedIn: true,
-        sendSmsStatus: false
+        sendSmsStatus: false,
+        orgName
       };
     },
     smsStatus: (state, action: PayloadAction<{ status: boolean, number: number }>) => {
@@ -48,6 +51,7 @@ export const slice = createSlice({
       state.number=action.payload.data
       state.isLoggedIn = true,
         state.role = ROLE_TYPE_USER
+        state.orgName=action.payload.orgName
     }
     
   },

@@ -83,9 +83,10 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
   //   }
   // },[])
   const [departmentData, setDepartmentData] = useState([]);
-  const[timezone,setTimezone]=useState(true)
+  const[timezone,setTimezone]=useState(true);
+  const orgName=useAppSelector(selectAuthenticated).orgName
   useEffect(() => {
-    fetchDepartment().then((data) => {
+    fetchDepartment(orgName).then((data) => {
       const departmentArray = data.data.map(
         (item: { ddepartment: string; did: number }) => ({
           label: item.ddepartment,
@@ -106,7 +107,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
   useEffect(
     () => {
       if (!isListRender.current) {
-        fetchDesignation(dept).then((data) => {
+        fetchDesignation(orgName,dept).then((data) => {
           let designationdata: any = [];
           setDesActualData(data.data);
           data.data.map((entry: any) => {
@@ -148,7 +149,7 @@ const SecurityBookAppointmentScreen = ({ navigation }: any) => {
   useEffect(
     () => {
       if (!isDesignationRender.current) {
-        fetchOfficer(dept, desig).then((data) => {
+        fetchOfficer(orgName,dept, desig).then((data) => {
           let officerdata: any = [];
           setOdata(data.data);
           data.data.map((entry: any) => {

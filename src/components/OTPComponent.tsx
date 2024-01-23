@@ -23,9 +23,9 @@ const loginValidationSchema = yup.object().shape({
         .min(6, 'Otp Number must be at least 6 number').max(6,'Max 6 number is allowed'),
 });
 
-const OTPComponent = ({ navigation, otp ,formdata}: any) => {
+const OTPComponent = ({ navigation, otp ,formdata,orgName}: any) => {
     const authdata = useAppSelector(getUserInfo);
-
+console.log("inotp ocmponent",orgName)
     const dispatch = useAppDispatch();
 
     const expecteddata = otp;
@@ -40,7 +40,7 @@ const OTPComponent = ({ navigation, otp ,formdata}: any) => {
         if(validate)
         {
             console.log('datainotp',data);
-            dispatch(userloginSuccess({data:data.mobile}))
+            dispatch(userloginSuccess({data:data.mobile,orgName:orgName}))
             navigation.navigate('UserDashboardScreen',{data:data,otp})
            
            

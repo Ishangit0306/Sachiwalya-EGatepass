@@ -70,7 +70,8 @@ export interface AuthState {
   smsSendToNumber?: number | null,
   number?:number|null,
   eid?:number|null,
-  userName?:string|null
+  userName?:string|null,
+  orgName?:string|null
 }
 
 export type UserFormData={

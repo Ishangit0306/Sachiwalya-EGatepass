@@ -243,8 +243,10 @@ if(params.authdata.name===null)
     setDatePickerVisible(false);
   };
   const [dept, setDpt] = useState<any>("");
+  const orgName=useAppSelector(selectAuthenticated).orgName;
+console.log("org",orgName)
   useEffect(() => {
-    departmentName().then((res) => {
+    departmentName(orgName).then((res) => {
       setDepartmentdata(res.data.map((item: any) => ({
         label: item.ddepartment,
         value: item.did
@@ -261,7 +263,7 @@ if(params.authdata.name===null)
   //  })
   // },[dept]);
   useEffect(() => {
-    designationName(dept).then((res) => {
+    designationName(orgName,dept).then((res) => {
       // Assuming that the API response is stored in res.data
       const apiDesignations = res.data;
       //console.log('api designation', apiDesignations);
@@ -298,7 +300,7 @@ if(params.authdata.name===null)
   const [ofcr, setOfcr] = useState<any>('');
   //console.log("officer",ofcr);
   useEffect(() => {
-    officerName(dept, designation).then((res) => {
+    officerName(orgName,dept, designation).then((res) => {
       // Assuming that the API response is stored in res.data
       const apiOfficer = res.data;
       console.log("officernamebug",apiOfficer);
