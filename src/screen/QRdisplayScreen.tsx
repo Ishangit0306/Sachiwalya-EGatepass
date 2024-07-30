@@ -30,11 +30,11 @@ const QRdisplayScreen = ({ navigation, route }: any) => {
     }
   };
 
-  console.log("qrscreen", data);
+  console.warn("qrscreen", data);
   let status = data.isapproved;
   if (status == 1) {
     status = "Approved";
-  } else if (status == 2) {
+  } else if (status == 3) {
     status = "Rejected";
   } else {
     status = "Pending";

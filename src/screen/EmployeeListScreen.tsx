@@ -48,7 +48,7 @@ const statusText = (isapproved: number) => {
     return "Approved";
   }
 
-  if (isapproved === 2) {
+  if (isapproved === 3) {
     return "Rejected";
   }
 
@@ -63,7 +63,7 @@ const getStatusColor = (status: number) => {
       return "#FFA500"; // Orange
     case 1:
       return "#008000"; // Green
-    case 2:
+    case 3:
       return "#FF0000"; // Red
     default:
       return "#000000"; // Default to black or any other valid color code
@@ -175,13 +175,15 @@ const EmployeeListScreen = ({ navigation ,route}: any) => {
   const [selectedPrinter, setSelectedPrinter] = React.useState();
   const [selectedVisitorId, setSelectorVisitorId] = useState<number>();
   const [itemObj, setItemObj] = useState<any>({});
-  const handleButtonPress = (visitorId: number, isapproved: number, item: any) => {
+  const [org,setOrg]=useState<any>('');
+  const handleButtonPress = (visitorId: number, isapproved: number, item: any,orgName:any) => {
 
     if (authState?.role == ROLE_TYPE_EMPLOYEE && isapproved === 0) {
       setItemObj(item);
 
       setModalVisible(true);
       setSelectorVisitorId(visitorId);
+      setOrg(orgName);
     }
   };
   const _drawerOpenClose = () => {
@@ -290,7 +292,7 @@ console.log('iteeeeeeeem',itemObj)
       <>
         <Item
           item={{ ...item, date: formattedDate }}
-          onPress={() => handleButtonPress(item?.fkuid, item?.isapproved, item)}
+          onPress={() => handleButtonPress(item?.fkuid, item?.isapproved, item,item?.organization)}
           backgroundColor={backgroundColor}
           textColor={color}
           role={authState.role}
@@ -355,7 +357,7 @@ console.log('iteeeeeeeem',itemObj)
     }
 
     if (status === "Rejected") {
-      status_id = 2;
+      status_id = 3;
     }
 
     if (selectedVisitorId && authState?.token && status_id) {
@@ -365,6 +367,7 @@ console.log('iteeeeeeeem',itemObj)
         visitor_id: selectedVisitorId,
         status: status_id,
         token: authState?.token,
+        org:org,
       });
       //console.log("res from update ai",data);
       if (data.statusCode === 201) {

@@ -394,7 +394,7 @@ if (Constants.expoConfig && Constants.expoConfig.extra && Constants.expoConfig.e
       const formdata = {
         ...values,
         employeeId: empid,
-        organization_name: "Uk Secteriate",
+        organization_name: orgName,
         doc_type: id,
         apt_date: formatDate(date),
         apt_time: formatTime(time),

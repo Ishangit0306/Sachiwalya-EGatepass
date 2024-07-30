@@ -69,9 +69,15 @@ const VisitorLoginComponent = ({ navigation ,org}: any) => {
             if (!(await checkInternetConnection())) {
                 return;
             }
-
-            setIsSubmit(!isSubmit)
+            if(org==='')
+            {
+         Alert.alert("Please Choose Organisation")
+            }
+            else{
+                setIsSubmit(!isSubmit)
             sendOtp(values.mobileNumber, navigation,org);
+            }
+      
             //existingUser(values.mobileNumber)
         }
 

@@ -29,7 +29,17 @@ const Stack = createNativeStackNavigator();
 
 
 const DashboardRoutes = ({ role }: any) => {
-    const name= useAppSelector(selectAuthenticated).user?.userName;
+    //const name= useAppSelector(selectAuthenticated).user?.userName;
+    const email= useAppSelector(selectAuthenticated).user?.userName;
+    let Name:any;
+    if (email) {
+  // Extracting the name part before the '@' symbol
+  const atIndex = email.indexOf('@');
+  const name = atIndex !== -1 ? email.slice(0, atIndex) : email;
+  const alphaOnlyName = name.replace(/[^a-zA-Z]/g, '');
+  const formattedName = alphaOnlyName.charAt(0).toUpperCase() + alphaOnlyName.slice(1);
+Name=formattedName
+}
     return (
         <Stack.Navigator>
             {role === ROLE_TYPE_SECURITY ? (
@@ -39,7 +49,7 @@ const DashboardRoutes = ({ role }: any) => {
                         component={SecurityDashboardScreen}
                         options={() => ({
                             headerShown: true,
-                            headerTitle: `Welcome ${name}`,
+                            headerTitle: `Welcome ${Name}`,
                             headerTitleAlign: "center",
                         })}
                     />
@@ -78,7 +88,7 @@ const DashboardRoutes = ({ role }: any) => {
                         component={PassOfficeDashboardScreen}
                         options={() => ({
                             headerShown: true,
-                            headerTitle: `Welcome ${name}`,
+                            headerTitle: `Welcome ${Name}`,
                             headerTitleAlign: "center",
                         })}
                     />
@@ -125,7 +135,7 @@ const DashboardRoutes = ({ role }: any) => {
                         component={EmployeeDashboardScreen}
                         options={() => ({
                             headerShown: true,
-                            headerTitle: `Welcome ${name}`,
+                            headerTitle: `Welcome ${Name}`,
                             headerTitleAlign: "center",
                         })}
                     />

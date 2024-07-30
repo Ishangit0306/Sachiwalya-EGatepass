@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { TextInput, Button, Headline } from 'react-native-paper';
 import Icons from '../constants/Icons';
 import VisitorLoginComponent from '../components/VisitorLoginComponent';
@@ -14,7 +14,7 @@ const MemberScreen = ({ navigation }: any) => {
   ]
 
   const authState = useAppSelector(selectAuthenticated);
-  const [org, setOrg] = useState('Secreteriat')
+  const [org, setOrg] = useState('')
   return (
     <KeyboardAvoidingView
       behavior={"padding"}
@@ -63,7 +63,7 @@ const MemberScreen = ({ navigation }: any) => {
         }}>
           {/* Login compoenent */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>SELECT ORGANIZATION </Text>
+            <Text style={styles.label}> SELECT ORGANISATION</Text>
             <Dropdown
               style={styles.dropdown}
               placeholderStyle={styles.placeholderStyle}
@@ -73,7 +73,7 @@ const MemberScreen = ({ navigation }: any) => {
               maxHeight={300}
               labelField="label"
               valueField="value"
-              placeholder={"SELECT ORGANIZATION"}
+              placeholder={"Select Organisation"}
               value={org}
               onChange={(item) => {
                 setOrg(item.value);
@@ -101,7 +101,13 @@ const MemberScreen = ({ navigation }: any) => {
           <VisitorLoginComponent navigation={navigation} org={org} />
           <View>
             <TouchableOpacity
-              onPress={() => navigation.navigate('Login',{org})}>
+                           onPress={() => {
+                            if (org==='') {
+                              Alert.alert("Please Choose Organisation")
+                            } else {
+                             navigation.navigate('Login',{org})
+                            }
+                          }}>
               <Text style={styles.label}>Login</Text>
             </TouchableOpacity>
 

@@ -34,6 +34,8 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
   const visitorImgData = useAppSelector(getVisitorScannedPhoto);
   const visitorData = useAppSelector(getVisitorsList);
   const authState: any = useAppSelector(selectAuthenticated);
+  const orgName=useAppSelector(selectAuthenticated).orgName
+  console.log("orgNameessss",orgName)
   const [disabledUploadButton, setDisabledUploadButton] =
     useState<boolean>(false);
   const dispatch = useAppDispatch();
@@ -230,7 +232,7 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
     }
     //sendSMSToVisitor(phNo, msg);
   }
-  
+
   const uploadAllAppointmentFormData = async () => {
     let imageUploadArr = [];
 
@@ -298,7 +300,8 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
       officer_name:params?.officer_name,
       officer_o_name:params?.officer_o_name,
       submitted_by:eid,
-      meeting_purpose:params?.meeting_purpose
+      meeting_purpose:params?.meeting_purpose,
+      organization:orgName,
     };
 
 
@@ -325,7 +328,8 @@ const VisitorPhotoScreen = ({ navigation, route }: any) => {
     formData.append("officer_o_name",formStoreData.officer_o_name);
     formData.append("officer_did",formStoreData.officer_did);
     formData.append("submitted_by",formStoreData.submitted_by);
-    formData.append("meeting_purpose",formStoreData.meeting_purpose)
+    formData.append("meeting_purpose",formStoreData.meeting_purpose);
+    formData.append("organization",formStoreData.organization);
 
     console.log('my form data>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>#########################', formStoreData);
 

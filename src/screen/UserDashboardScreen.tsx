@@ -26,6 +26,7 @@ const UserDashboardScreen = ({ navigation, route }: any) => {
         { label: "None", value: 4 }
 
     ];
+    const org=useAppSelector(selectAuthenticated).orgName;
     const mobile= useAppSelector(selectAuthenticated).number
     const [dropid, setDropid] = useState<any>(1);
     let { params } = route;
@@ -138,10 +139,10 @@ if(route.key )
 
     }
     const showQR=async (mob:any)=>{
-            Linking.openURL(`https://iammaven.com/oldvisitor/qrcode/${mob}`);
+            Linking.openURL(`https://iammaven.com/oldvisitor/qrcode/${mob}/${org}`);
  
             try {
-                const response = await Linking.openURL(`https://iammaven.com/oldvisitor/qrcode/${mob}`);
+                const response = await Linking.openURL(`https://iammaven.com/oldvisitor/qrcode/${mob}/${org}`);
         
                 // Check if the request was successful (status code 2xx)
                 if (response && response.ok) {

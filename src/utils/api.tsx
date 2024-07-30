@@ -31,8 +31,10 @@ export const fetchLoginApi = async (data: any) => {
   const requestBody = {
     username: requestData.email,
     password: requestData.password,
-    dv_token:requestData.deviceToken
+    dv_token:requestData.deviceToken,
+    org:requestData.orgName,
   };
+  console.log("request Data going ",requestBody)
   try {
     console.log('base url', API_BASE_URL);
     const response = await fetch(`${API_BASE_URL}/api/login`, {
@@ -186,7 +188,6 @@ export const getVisitorsListApi = async ({ token, role ,etype,eid,archive}: GET_
   //   'current url will be hit for visitor>>>>>>>>>>>>>>>>>>>>>>',
   //   API_URL_VISITOR
   // );
-
   const response = await fetch(`${API_URL_VISITOR}`, {
     method: 'GET',
     headers: {
@@ -329,20 +330,23 @@ type StausUpdateType = {
   visitor_id: number;
   status: number;
   token: string;
+  org:any;
 };
 
 export const updateVisitorStatusApi = async ({
   visitor_id,
   status,
   token,
+  org,
 }: StausUpdateType) => {
   console.log("Status", status);
   // Assuming you have the necessary data to construct the requestBody
   const requestBody = {
     visitor_id: visitor_id,
     status: status,
+    org:org
   };
-
+console.log("updatestatusreq bodyy",requestBody)
   try {
     const response = await fetch(
       `${API_BASE_URL}/oldvisitor/updateVisitorStatus`,
